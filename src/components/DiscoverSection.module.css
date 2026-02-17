@@ -1,0 +1,21 @@
+.list {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+
+.empty {
+    padding: 0 32px;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .list {
+        padding: 0 24px;
+    }
+
+    .empty {
+        padding: 0 24px;
+    }
+}

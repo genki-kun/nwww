@@ -1,0 +1,112 @@
+.boardList {
+    /* Transparent bg for cleaner look in sidebar */
+    background: transparent;
+    padding: 0;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.count {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+.scrollArea {
+    /* Layout handled by parent */
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.categorySection {
+    /* Group spacing */
+    margin-bottom: var(--spacing-md);
+}
+
+/* Category Title Spec */
+.categoryTitle {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted-foreground);
+    margin-bottom: 12px;
+    padding-left: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.item {
+    margin: 0;
+}
+
+/* Link Spec */
+.link {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    /* 8px vertical/horizontal */
+    border-radius: 6px;
+    font-size: 14px;
+    text-decoration: none;
+    transition: all 200ms ease;
+    gap: 12px;
+    /* icon and text gap */
+
+    /* Default State */
+    color: var(--sidebar-foreground);
+    opacity: 0.8;
+}
+
+.icon {
+    color: var(--muted-foreground);
+    transition: color 200ms;
+}
+
+/* Hover State */
+.link:hover {
+    background-color: var(--sidebar-accent);
+    color: var(--sidebar-foreground);
+    opacity: 1;
+}
+
+.link:hover .icon {
+    color: var(--sidebar-foreground);
+    opacity: 0.6;
+}
+
+.boardName {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+.description {
+    display: none;
+}

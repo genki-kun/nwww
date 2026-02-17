@@ -1,0 +1,217 @@
+/* ===== Mobile Header - Only shown at 768px and below ===== */
+
+/* Hide on desktop */
+.header {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        height: 56px;
+        padding: 0 16px;
+        background: var(--background);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(12px);
+    }
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+}
+
+/* Logo theme switching */
+.logoLight {
+    display: block;
+}
+
+.logoDark {
+    display: none;
+}
+
+:global([data-theme="dark"]) .logoLight {
+    display: none;
+}
+
+:global([data-theme="dark"]) .logoDark {
+    display: block;
+}
+
+/* Header Right */
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.menuButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--foreground);
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.menuButton:hover {
+    background: var(--accent);
+}
+
+/* ===== Overlay ===== */
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 198;
+    /* Higher than FAB (100) */
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.overlayVisible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ===== Drawer ===== */
+.drawer {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    bottom: 0;
+    z-index: 199;
+    /* Higher than FAB (100) */
+    width: 300px;
+    max-width: 85vw;
+    background: var(--background);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.drawerOpen {
+    transform: translateX(0);
+}
+
+/* ===== Search in Drawer ===== */
+.searchForm {
+    position: relative;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.searchIcon {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted-foreground);
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    background: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--foreground);
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+    border-color: var(--ring);
+}
+
+/* ===== Board List in Drawer ===== */
+.boardList {
+    padding: 16px;
+}
+
+.boardListHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.boardListTitle {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--foreground);
+}
+
+.boardCount {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.categorySection {
+    margin-bottom: 20px;
+}
+
+.categoryTitle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.boardLink {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 8px 8px 12px;
+    font-size: 0.85rem;
+    color: var(--foreground);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+
+.boardLink:hover,
+.boardLink:active {
+    background: var(--accent);
+}
+
+.drawerFooter {
+    padding: 16px 24px 32px 24px;
+    margin-top: auto;
+    /* Push to bottom if flex column */
+}
+
+.footerDivider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 24px;
+    width: 100%;
+}

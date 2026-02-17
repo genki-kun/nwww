@@ -1,27 +1,113 @@
 :root {
+  /* --- Typography --- */
+  --font-sans: "Inter", "Noto Sans JP", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Fira Code", "Menlo", "Monaco", "Consolas", monospace;
+
+  /* --- Spacing --- */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 4rem;
+
+  /* --- Border Radius (Rounded) --- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  /* --- Soft Light Theme (Reference Match) --- */
+  --color-bg-base: #f8f9fa;
+  /* Very Light Gray (App Background) */
+  --color-bg-surface: #ffffff;
+  /* Pure White (Card Background) */
+  --color-bg-sidebar: #ffffff;
+  /* White Sidebar */
+
+  --color-text-primary: #1a1a1a;
+  /* Almost Black */
+  --color-text-secondary: #5e6c84;
+  /* Cool Gray */
+  --color-text-muted: #8993a4;
+  /* Lighter Gray */
+
+  --color-border: #eaecf0;
+  /* Very subtle border */
+  --color-divider: #f2f4f7;
+
+  --color-accent: #1a1a1a;
+  /* Black Accent */
+  --color-accent-hover: #333333;
+
+  --color-fire: #1a1a1a;
+  --color-fire-bg: #f2f4f7;
+
+  /* --- New Design Spec (Strict) --- */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #0f172a;
+  /* Slate 900 approx for oklch(0.145 0 0) */
+  --card: #ffffff;
+  --muted: #f1f5f9;
+  /* Slate 100 */
+  --muted-foreground: #64748b;
+  /* Slate 500 */
+  --accent: #f8fafc;
+  /* Slate 50 */
+  --accent-foreground: #0f172a;
+  --border: #e2e8f0;
+  /* Slate 200 */
+  --input: #e2e8f0;
+  --ring: #94a3b8;
+  /* Slate 400 */
+
+  /* Sidebar Spec */
+  --sidebar-bg: rgba(255, 255, 255, 0.7);
+  --sidebar-border: rgba(0, 0, 0, 0.06);
+  --sidebar-accent: rgba(233, 235, 239, 0.5);
+  --sidebar-foreground: #252525;
+  --muted-foreground: #717182;
+  --sidebar-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  /* Utilities for backdrop blur if not using Tailwind utilities */
+  --backdrop-blur-md: blur(12px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* --- Dark Mode --- */
+[data-theme="dark"] {
+  --color-bg-base: #0f1117;
+  --color-bg-surface: #1a1d27;
+  --color-bg-sidebar: #13151d;
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
+  --color-text-primary: #e4e6eb;
+  --color-text-secondary: #9ca3b4;
+  --color-text-muted: #6b7280;
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --color-border: #2a2d3a;
+  --color-divider: #1f222e;
+
+  --color-accent: #e4e6eb;
+  --color-accent-hover: #c8cbd2;
+
+  --color-fire: #e4e6eb;
+  --color-fire-bg: #1f222e;
+
+  --background: #0f1117;
+  --foreground: #e4e6eb;
+  --card: #1a1d27;
+  --muted: #1f222e;
+  --muted-foreground: #8b92a5;
+  --accent: #252836;
+  --accent-foreground: #e4e6eb;
+  --border: #2a2d3a;
+  --input: #2a2d3a;
+  --ring: #4a5068;
+
+  --sidebar-bg: rgba(19, 21, 29, 0.85);
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-accent: rgba(42, 45, 58, 0.6);
+  --sidebar-foreground: #d1d5db;
+  --muted-foreground: #8b92a5;
+  --sidebar-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 * {
@@ -30,13 +116,38 @@ body {
   margin: 0;
 }
 
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 a {
   color: inherit;
   text-decoration: none;
+  transition: color 0.2s;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+a:hover {
+  color: var(--color-accent);
+}
+
+/* Utility to hide scrollbar but allow scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

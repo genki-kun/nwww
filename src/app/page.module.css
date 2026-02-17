@@ -1,141 +1,160 @@
-.page {
-  --background: #fafafa;
-  --foreground: #fff;
-
-  --text-primary: #000;
-  --text-secondary: #666;
-
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
-
-  display: flex;
-  min-height: 100vh;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-geist-sans);
-  background-color: var(--background);
-}
-
+/* Main Container */
 .main {
-  display: flex;
   min-height: 100vh;
-  width: 100%;
-  max-width: 800px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  background-color: var(--foreground);
-  padding: 120px 60px;
+  background-color: var(--background);
+  padding-bottom: 4rem;
 }
 
-.intro {
+
+
+/* ─── Section Common ─── */
+.section {
+  padding: 64px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.sectionLast {
+  border-bottom: none;
+}
+
+.sectionHeader {
+  padding: 0 32px;
+  margin-bottom: 40px;
+}
+
+/* Section Title Typography */
+.sectionTitle {
+  font-family: var(--font-sans);
+  font-size: 3rem;
+  /* 48px */
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+  color: var(--foreground);
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 24px;
-}
-
-.intro h1 {
-  max-width: 320px;
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 48px;
-  letter-spacing: -2.4px;
-  text-wrap: balance;
-  color: var(--text-primary);
-}
-
-.intro p {
-  max-width: 440px;
-  font-size: 18px;
-  line-height: 32px;
-  text-wrap: balance;
-  color: var(--text-secondary);
-}
-
-.intro a {
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.ctas {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 440px;
-  gap: 16px;
-  font-size: 14px;
-}
-
-.ctas a {
-  display: flex;
-  justify-content: center;
   align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 128px;
-  border: 1px solid transparent;
-  transition: 0.2s;
-  cursor: pointer;
-  width: fit-content;
+  gap: 12px;
+}
+
+/* Fluorescent Green Dot Indicator */
+.sectionTitle::before {
+  content: '';
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: #39FF14;
+  flex-shrink: 0;
+}
+
+.sectionSub {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
   font-weight: 500;
+  margin: 8px 0 0 0;
 }
 
-a.primary {
-  background: var(--text-primary);
-  color: var(--background);
-  gap: 8px;
+/* ─── WHAT'S NEW (Horizontal Scroll) ─── */
+/* ─── WHAT'S NEW (Horizontal Scroll) ─── */
+.whatsNewScroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 16px;
+  /* Add padding top/bottom to avoid clipping hover effects */
+  padding: 20px 32px 20px 32px;
+  /* Negative margin to maintain vertical rhythm despite padding */
+  margin-top: -20px;
+  margin-bottom: -12px;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-a.secondary {
-  border-color: var(--button-secondary-border);
+.whatsNewScroll::-webkit-scrollbar {
+  display: none;
 }
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
-  }
-
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
-  }
+/* ─── PICK UP Section ─── */
+.pickUpSection {
+  background-color: var(--accent);
+  /* bg-muted/30 */
 }
 
-@media (max-width: 600px) {
-  .main {
-    padding: 48px 24px;
-  }
-
-  .intro {
-    gap: 16px;
-  }
-
-  .intro h1 {
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -1.92px;
-  }
+.pickUpList {
+  max-width: 80rem;
+  /* max-w-7xl */
+  margin: 0 auto;
+  padding: 0 32px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
+/* ─── DISCOVER Section ─── */
+.discoverTitle {
+  font-family: var(--font-noto), sans-serif;
+  font-size: 1.875rem;
+  /* 30px / text-3xl */
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  margin: 0 0 0.75rem 0;
+  /* mb-3 */
+  color: var(--foreground);
+}
+
+.discoverList {
+  max-width: 80rem;
+  /* max-w-7xl */
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ─── Empty State ─── */
+.emptyState {
+  padding: 0 32px;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}
+
+/* ─── Mobile Responsive ─── */
+@media (max-width: 768px) {
+  .section {
+    padding: 40px 0;
   }
 
-  .page {
-    --background: #000;
-    --foreground: #000;
+  .sectionHeader {
+    padding: 0 24px;
+    margin-bottom: 24px;
+  }
 
-    --text-primary: #ededed;
-    --text-secondary: #999;
+  .sectionTitle {
+    font-size: 1.75rem;
+    gap: 8px;
+  }
 
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
+  .sectionTitle::before {
+    width: 8px;
+    height: 8px;
+  }
+
+  .whatsNewScroll {
+    padding: 0 24px;
+    gap: 12px;
+  }
+
+  .pickUpList {
+    padding: 0 24px;
+  }
+
+  .discoverTitle {
+    font-size: 1.25rem;
+  }
+
+  .discoverList {
+    padding: 0 24px;
+  }
+
+  .emptyState {
+    padding: 0 24px;
   }
 }

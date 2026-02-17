@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Board {
+  id          String   @id
+  name        String
+  description String
+  category    String
+  threads     Thread[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Thread {
+  id            String   @id @default(cuid())
+  title         String
+  
+  // Metadata & Stats
+  views         Int      @default(0)
+  postCount     Int      @default(0) // Denormalized count for performance
+  momentum      Int      @default(0)
+  status        String   @default("active") // 'active' | 'archived'
+  lastUpdated   DateTime @default(now())
+
+  // AI Generation & Source Tracking
+  isAiGenerated Boolean  @default(false)
+  sourceUrl     String?  // URL of the news/tweet
+  sourceTitle   String?  // Original title of the source
+  sourcePlatform String? // 'twitter', 'news', 'youtube', etc.
+  aiAnalysis    String?  // Summary or analysis by AI
+
+  // Tags (Stored as JSON string in SQLite)
+  tags          String   @default("[]") 
+
+  // Relations
+  boardId       String
+  board         Board    @relation(fields: [boardId], references: [id])
+  posts         Post[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Post {
+  id            String   @id @default(cuid())
+  
+  content       String
+  author        String   @default("名無しさん")
+  
+  // User & AI Metadata
+  userId        String?  // Hashed IP or user ID
+  tripcode      String?  // For tripcode feature
+  isAiGenerated Boolean  @default(false)
+  likes         Int      @default(0)
+
+  // Relations
+  threadId      String
+  thread        Thread   @relation(fields: [threadId], references: [id])
+  reports       Report[]
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Report {
+  id            String   @id @default(cuid())
+  reason        String   // 'spam', 'abuse', 'illegal', 'other'
+  detail        String?  // Optional detail text
+  reporterIp    String?  // IP of reporter (hashed)
+  status        String   @default("pending") // 'pending' | 'resolved' | 'dismissed'
+
+  // Relations
+  postId        String
+  post          Post     @relation(fields: [postId], references: [id])
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

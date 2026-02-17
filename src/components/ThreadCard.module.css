@@ -1,0 +1,281 @@
+/* ─── Base Card ─── */
+.card {
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 200ms ease;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+    padding: 20px;
+}
+
+.card:hover {
+    border-color: var(--ring);
+}
+
+/* ─── Horizontal variant (WHAT'S NEW) ─── */
+/* ─── Horizontal variant (WHAT'S NEW) - Refined ─── */
+/* ─── Horizontal variant (WHAT'S NEW) - Refined (Calm & Modern) ─── */
+.horizontal {
+    width: 320px;
+    height: 160px;
+    flex-shrink: 0;
+
+    /* Modern Clean Base - Dark Mode Compatible */
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    /* Subtle, Calm Shadow */
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        0 1px 2px rgba(0, 0, 0, 0.02);
+
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    z-index: 1;
+}
+
+.horizontal:hover {
+    transform: translateY(-2px);
+    border-color: var(--ring);
+    background: var(--card);
+
+    /* Soft Elevation */
+    box-shadow:
+        0 12px 24px -4px rgba(0, 0, 0, 0.1),
+        0 4px 8px -2px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+}
+
+/* Removed futuristic pseudo-elements */
+
+.horizontal:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* ─── Grid variant (PICK UP / DISCOVER) ─── */
+.grid {
+    height: auto;
+}
+
+/* ─── Meta Info ─── */
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    line-height: 1;
+}
+
+.boardName {
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+.separator {
+    color: var(--muted-foreground);
+}
+
+.time {
+    color: var(--muted-foreground);
+}
+
+.timeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--muted-foreground);
+}
+
+/* ─── Title ─── */
+.title {
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.625;
+    color: var(--foreground);
+    margin: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: opacity 200ms ease;
+}
+
+/* Bold title for horizontal (WHAT'S NEW) cards */
+.horizontalTitle {
+    font-weight: 700;
+}
+
+.card:hover .title {
+    opacity: 0.7;
+}
+
+.lineClamp2 {
+    -webkit-line-clamp: 2;
+}
+
+/* ─── Title margin for grid cards (push stats down) ─── */
+.titleGrid {
+    margin-bottom: 16px;
+    flex-grow: 1;
+}
+
+/* ─── Stats ─── */
+.stats {
+    margin-top: auto;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.commentCount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--foreground);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.commentLabel {
+    font-size: 0.875rem;
+    font-weight: 400;
+    /* Color not specified in request, so inherit (likely foreground) */
+    color: inherit;
+}
+
+/* ═══════════════════════════════════════════ */
+/* ─── List Variant (PICK UP / DISCOVER) ─── */
+/* ═══════════════════════════════════════════ */
+.listItem {
+    display: block;
+    padding: 20px 24px;
+    background-color: var(--card);
+    border-bottom: 1px solid var(--border);
+    /* border-border/40 */
+    text-decoration: none;
+    color: inherit;
+    transition: all 200ms ease;
+}
+
+.listItem:hover {
+    background-color: var(--accent);
+    /* bg-muted/50 */
+}
+
+.listItem:last-child {
+    border-bottom: none;
+}
+
+/* ─── List Title ─── */
+.listTitle {
+    font-size: 1.125rem;
+    /* text-lg */
+    font-weight: 500;
+    line-height: 1.375;
+    /* leading-snug */
+    margin: 0 0 12px 0;
+    /* mb-3 */
+    color: var(--foreground);
+    transition: color 200ms ease;
+}
+
+.listItem:hover .listTitle {
+    color: var(--muted-foreground);
+    /* text-foreground/70 */
+}
+
+/* ─── List Meta Row ─── */
+.listMeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.listMetaLeft {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.listBoardName {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    /* text-foreground/70 */
+}
+
+.listSeparator {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    /* text-muted-foreground/30 */
+}
+
+.listTime {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.listTimeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+/* ─── List Comment Stats ─── */
+.listCommentStats {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.listCommentCount {
+    font-size: 1.25rem;
+    /* text-xl */
+    font-weight: 700;
+    color: var(--foreground);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+
+.listCommentLabel {
+    font-size: 0.75rem;
+    /* text-xs */
+    font-weight: 400;
+    color: var(--muted-foreground);
+}
+
+/* ─── Mobile Responsive ─── */
+@media (max-width: 768px) {
+    .horizontal {
+        width: 260px;
+        height: 120px;
+        padding: 14px;
+        box-shadow:
+            0 2px 4px rgba(0, 0, 0, 0.04),
+            0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    .card {
+        padding: 14px;
+    }
+
+    .title {
+        font-size: 0.9rem;
+    }
+
+    .listTitle {
+        font-size: 0.95rem;
+    }
+
+    .listItem {
+        padding: 16px 20px;
+    }
+}

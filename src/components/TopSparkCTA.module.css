@@ -1,0 +1,334 @@
+/* ─── Trigger Button ─── */
+/* ─── Trigger Button (FAB) ─── */
+.triggerButtonWrapper {
+    /* No layout needed for fixed element */
+}
+
+.triggerButton {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 100;
+
+    background: #020203;
+    color: #ffffff;
+    border: none;
+    padding: 16px 28px;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* High Elevation Shadow */
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06),
+        0 10px 15px -3px rgba(0, 0, 0, 0.15);
+}
+
+.triggerButton:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.15),
+        0 10px 10px -5px rgba(0, 0, 0, 0.08);
+}
+
+.triggerButton:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* ─── Overlay & Modal ─── */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+    background: var(--card);
+    width: 90%;
+    max-width: 672px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 24px;
+    position: relative;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    color: #020203;
+}
+
+/* ─── Header ─── */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.titleArea {
+    flex: 1;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--foreground);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.titleIcon {
+    color: var(--foreground);
+}
+
+.description {
+    color: var(--muted-foreground);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.closeButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted-foreground);
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeButton:hover {
+    background: var(--accent);
+    color: var(--foreground);
+}
+
+/* ─── Form Elements ─── */
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 400;
+    background: var(--background);
+    color: var(--foreground);
+    transition: all 0.2s ease;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--foreground);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.input::placeholder {
+    color: var(--muted-foreground);
+}
+
+.helperText {
+    font-size: 13px;
+    color: var(--muted-foreground);
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
+.errorText {
+    color: #ef4444;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+/* ─── Actions ─── */
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.cancelButton {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+    background: var(--accent);
+    color: var(--foreground);
+}
+
+.submitButtonAi {
+    padding: 12px 24px;
+    background: var(--foreground);
+    color: var(--background);
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.submitButtonAi:hover:not(:disabled) {
+    opacity: 0.8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.submitButtonAi:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+/* ─── Processing State ─── */
+.processingState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 40px 0;
+    text-align: center;
+}
+
+.spinner {
+    color: var(--foreground);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.processingText {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--foreground);
+    margin: 0;
+}
+
+.processingSub {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+    margin: 0;
+}
+
+/* ─── Done State ─── */
+.doneState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 32px 0;
+}
+
+.doneIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #10b981;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.doneText {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--foreground);
+}
+
+.doneSubtext {
+    font-size: 0.9rem;
+    color: var(--muted-foreground);
+    margin: 0;
+}
+
+/* ─── Animations ─── */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 768px) {
+    .modal {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        border-radius: 0;
+        padding: 20px;
+    }
+}

@@ -1,0 +1,191 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(var(--border-rgb), 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.backButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--foreground);
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.backButton:hover {
+    background: var(--muted);
+}
+
+.title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Search Form */
+.searchForm {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.searchInputWrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 0.75rem;
+    color: var(--muted-foreground);
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    background: var(--background);
+    border: 1px solid rgba(var(--border-rgb), 0.2);
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--foreground);
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: var(--foreground);
+    box-shadow: 0 0 0 2px rgba(var(--ring-rgb), 0.1);
+}
+
+.searchButton {
+    padding: 0.75rem 1.5rem;
+    background: var(--foreground);
+    color: var(--background);
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.2s;
+}
+
+.searchButton:hover {
+    opacity: 0.9;
+}
+
+/* Results */
+.results {
+    padding-bottom: 2rem;
+}
+
+.resultCount {
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+    margin-bottom: 1rem;
+}
+
+.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 3rem 0;
+    color: var(--muted-foreground);
+}
+
+.threadList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.cardLink {
+    text-decoration: none;
+    color: inherit;
+}
+
+.threadCard {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(var(--border-rgb), 0.1);
+    background: var(--card);
+    transition: box-shadow 0.2s;
+}
+
+.threadCard:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.boardBadge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    background: var(--accent);
+    color: var(--muted-foreground);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.threadTitle {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.cardFooter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.timestamp {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stats {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.statItem {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}

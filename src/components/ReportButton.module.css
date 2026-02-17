@@ -1,0 +1,88 @@
+.container {
+    position: relative;
+    display: inline-flex;
+}
+
+.trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--muted-foreground);
+    padding: 0.2rem;
+    border-radius: 0.25rem;
+    transition: color 0.2s, background 0.2s;
+    opacity: 0.4;
+}
+
+.trigger:hover {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.08);
+    opacity: 1;
+}
+
+.dropdown {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    min-width: 160px;
+    background: var(--card);
+    border: 1px solid rgba(var(--border-rgb), 0.15);
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    overflow: hidden;
+    animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownTitle {
+    font-size: 0.7rem;
+    color: var(--muted-foreground);
+    padding: 0.5rem 0.75rem 0.25rem;
+    font-weight: 600;
+}
+
+.reasonButton {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    color: var(--foreground);
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.reasonButton:hover {
+    background: var(--accent);
+}
+
+.reasonButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.done {
+    padding: 0.75rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #27ae60;
+    font-weight: 600;
+}
