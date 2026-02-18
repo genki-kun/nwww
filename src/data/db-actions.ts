@@ -108,6 +108,7 @@ interface PrismaThread {
     lastUpdated: Date;
     postCount: number;
     views: number;
+    momentum: number;
     tags: any;
     aiAnalysis: string | null;
     isAiGenerated: boolean;
