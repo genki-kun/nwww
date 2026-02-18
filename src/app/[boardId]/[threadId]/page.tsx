@@ -57,13 +57,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 export default async function ThreadPage({ params }: PageProps) {
     const paramsPromise = params;
 
     const { boardId, threadId } = await paramsPromise;
     const thread = await getThread(boardId, threadId);
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     const isAdmin = !!session;
 
     if (!thread) {

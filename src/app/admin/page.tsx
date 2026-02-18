@@ -6,10 +6,11 @@ import { notFound } from 'next/navigation';
 import styles from './page.module.css';
 
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function AdminPage() {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
     // Middleware already protects this path, but double-check for safety
     if (!session) {

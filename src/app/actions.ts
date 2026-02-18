@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { addPost, createThread, updatePostStatus, updateThreadStatus } from '@/data/db-actions';
 import { revalidatePath } from 'next/cache';
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 import { checkRateLimit } from '@/lib/rate-limit';
 
@@ -128,7 +129,7 @@ export async function reportPost(formData: FormData) {
 }
 
 export async function deletePostAction(formData: FormData) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
         return { success: false, message: 'Unauthorized' };
     }
@@ -143,7 +144,7 @@ export async function deletePostAction(formData: FormData) {
 }
 
 export async function restorePostAction(formData: FormData) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
         return { success: false, message: 'Unauthorized' };
     }
@@ -158,7 +159,7 @@ export async function restorePostAction(formData: FormData) {
 }
 
 export async function deleteThreadAction(formData: FormData) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
         return { success: false, message: 'Unauthorized' };
     }
@@ -172,7 +173,7 @@ export async function deleteThreadAction(formData: FormData) {
 }
 
 export async function updateReportStatus(formData: FormData) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
         return { success: false, message: 'Unauthorized' };
     }
@@ -188,7 +189,7 @@ export async function updateReportStatus(formData: FormData) {
 }
 
 export async function toggleBoardStatusAction(formData: FormData) {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session) {
         return { success: false, message: 'Unauthorized' };
     }
