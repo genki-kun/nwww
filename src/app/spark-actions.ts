@@ -3,7 +3,15 @@
 import { createThread, getBoards } from '@/data/mockBBS';
 import { revalidatePath } from 'next/cache';
 
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+
 export async function triggerScheduledSpark(boardId: string) {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+        throw new Error("Unauthorized");
+    }
+
     // 1. Get the target board to understand context (mocking AI context understanding)
     const boards = await getBoards();
     const targetBoard = boards.find(b => b.id === boardId);
