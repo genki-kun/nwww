@@ -7,7 +7,8 @@ import ThreadSummarizer from './ThreadSummarizer';
 import PostContent from './PostContent';
 import ReportButton from './ReportButton';
 import { recordBoardVisit } from './DiscoverSection';
-import styles from '@/app/[boardId]/[threadId]/page.module.css'; // Importing from page module to reuse styles
+import Link from 'next/link';
+import styles from '@/app/[boardId]/[threadId]/page.module.css';
 import { MessageSquareReply } from 'lucide-react';
 import { deletePostAction, restorePostAction } from '@/app/actions';
 
@@ -71,7 +72,7 @@ export default function ThreadInteractiveView({ boardId, thread, isAdmin }: Thre
                         gap: '0.5rem'
                     }}>
                         <span><strong>ADMIN MODE ACTIVE:</strong> Moderation tools are visible.</span>
-                        <a
+                        <Link
                             href="/admin"
                             style={{
                                 backgroundColor: '#ef4444',
@@ -83,7 +84,7 @@ export default function ThreadInteractiveView({ boardId, thread, isAdmin }: Thre
                             }}
                         >
                             通報を確認する
-                        </a>
+                        </Link>
                     </div>
                 )}
 
