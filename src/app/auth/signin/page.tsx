@@ -1,7 +1,6 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next-auth/react'; // Actually it's from next/navigation for query params
 import { useSearchParams as useNextSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Github } from 'lucide-react';
