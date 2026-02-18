@@ -6,13 +6,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "postinstall": "prisma generate"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@prisma/client": "5.10.2",
     "cheerio": "^1.2.0",
     "lucide-react": "^0.564.0",
     "next": "16.1.6",
@@ -21,7 +23,6 @@
     "react-tweet": "^3.3.0"
   },
   "devDependencies": {
-    "@prisma/client": "5.10.2",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
