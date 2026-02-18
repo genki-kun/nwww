@@ -10,6 +10,7 @@ import AIInsights from '@/components/AIInsights';
 import SparkAdmin from '@/components/SparkAdmin';
 import ThemeToggle from '@/components/ThemeToggle';
 import MobileHeader from '@/components/MobileHeader';
+import Providers from '@/components/Providers';
 import "./globals.css";
 import styles from './layout.module.css';
 
@@ -115,7 +116,7 @@ export default async function RootLayout({
                   />
                 </form>
               </div>
-              {children}
+              <Providers>{children}</Providers>
             </div>
           </main>
         </div>

@@ -56,13 +56,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-export default async function ThreadPage({ params, searchParams }: PageProps) {
+import { getServerSession } from "next-auth/next";
+
+export default async function ThreadPage({ params }: PageProps) {
     const paramsPromise = params;
-    const searchParamsPromise = searchParams;
 
     const { boardId, threadId } = await paramsPromise;
     const thread = await getThread(boardId, threadId);
-    const { admin: adminSecret } = await searchParamsPromise;
+    const session = await getServerSession();
+    const isAdmin = !!session;
 
     if (!thread) {
         notFound();
@@ -107,7 +109,7 @@ export default async function ThreadPage({ params, searchParams }: PageProps) {
                         status: p.status
                     }))
                 } as any}
-                adminSecret={adminSecret}
+                isAdmin={isAdmin}
             />
         </div>
     );

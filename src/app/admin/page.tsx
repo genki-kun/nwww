@@ -5,18 +5,15 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import styles from './page.module.css';
 
-interface AdminPageProps {
-    searchParams: Promise<{
-        admin?: string;
-    }>;
-}
+import { getServerSession } from "next-auth/next";
+import { redirect } from "next/navigation";
 
-export default async function AdminPage({ searchParams }: AdminPageProps) {
-    const { admin: adminSecret } = await searchParams;
-    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
+export default async function AdminPage() {
+    const session = await getServerSession();
 
-    if (adminSecret !== SECRET) {
-        notFound();
+    // Middleware already protects this path, but double-check for safety
+    if (!session) {
+        redirect("/api/auth/signin");
     }
 
     const reports = await getReports();
@@ -34,11 +31,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
             </header>
 
             <section className={styles.section}>
-                <BoardStatusManager initialBoards={allBoards as any} adminSecret={adminSecret || ''} />
+                <BoardStatusManager initialBoards={allBoards as any} />
             </section>
 
             <section className={styles.section}>
-                <ReportBoard initialReports={reports} adminSecret={adminSecret || ''} />
+                <ReportBoard initialReports={reports} />
             </section>
         </div>
     );

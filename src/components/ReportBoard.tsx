@@ -25,24 +25,21 @@ interface Report {
 
 interface ReportBoardProps {
     initialReports: Report[];
-    adminSecret: string;
 }
 
-export default function ReportBoard({ initialReports, adminSecret }: ReportBoardProps) {
+export default function ReportBoard({ initialReports }: ReportBoardProps) {
     const [reports, setReports] = useState(initialReports);
 
     const handleResolve = async (reportId: string, postId: string) => {
         // Soft delete post and resolve report
         const formData = new FormData();
         formData.append('postId', postId);
-        formData.append('adminSecret', adminSecret);
 
         // We only delete if they confirm, but for this UI we'll have separate buttons
         // This helper specifically resolves the report
         const resolveFormData = new FormData();
         resolveFormData.append('reportId', reportId);
         resolveFormData.append('status', 'resolved');
-        resolveFormData.append('adminSecret', adminSecret);
 
         await updateReportStatus(resolveFormData);
         setReports(reports.filter(r => r.id !== reportId));
@@ -52,7 +49,6 @@ export default function ReportBoard({ initialReports, adminSecret }: ReportBoard
         const formData = new FormData();
         formData.append('reportId', reportId);
         formData.append('status', 'dismissed');
-        formData.append('adminSecret', adminSecret);
 
         await updateReportStatus(formData);
         setReports(reports.filter(r => r.id !== reportId));
@@ -62,7 +58,6 @@ export default function ReportBoard({ initialReports, adminSecret }: ReportBoard
         // 1. Delete Post
         const deleteData = new FormData();
         deleteData.append('postId', postId);
-        deleteData.append('adminSecret', adminSecret);
         deleteData.append('boardId', boardId);
         deleteData.append('threadId', threadId);
         await deletePostAction(deleteData);
@@ -71,7 +66,6 @@ export default function ReportBoard({ initialReports, adminSecret }: ReportBoard
         const resolveData = new FormData();
         resolveData.append('reportId', reportId);
         resolveData.append('status', 'resolved');
-        resolveData.append('adminSecret', adminSecret);
         await updateReportStatus(resolveData);
 
         setReports(reports.filter(r => r.id !== reportId));

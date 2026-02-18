@@ -14,10 +14,9 @@ interface Board {
 
 interface BoardStatusManagerProps {
     initialBoards: Board[];
-    adminSecret: string;
 }
 
-export default function BoardStatusManager({ initialBoards, adminSecret }: BoardStatusManagerProps) {
+export default function BoardStatusManager({ initialBoards }: BoardStatusManagerProps) {
     const [boards, setBoards] = useState(initialBoards);
     const [isUpdating, setIsUpdating] = useState<string | null>(null);
 
@@ -28,7 +27,6 @@ export default function BoardStatusManager({ initialBoards, adminSecret }: Board
         const formData = new FormData();
         formData.append('boardId', boardId);
         formData.append('status', nextStatus);
-        formData.append('adminSecret', adminSecret);
 
         const result = await toggleBoardStatusAction(formData);
 

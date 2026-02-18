@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import crypto from 'crypto';
 import { addPost, createThread, updatePostStatus, updateThreadStatus } from '@/data/db-actions';
 import { revalidatePath } from 'next/cache';
+import { getServerSession } from "next-auth/next";
 
 import { checkRateLimit } from '@/lib/rate-limit';
 
@@ -127,15 +128,14 @@ export async function reportPost(formData: FormData) {
 }
 
 export async function deletePostAction(formData: FormData) {
+    const session = await getServerSession();
+    if (!session) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
     const postId = formData.get('postId') as string;
-    const adminSecret = formData.get('adminSecret') as string;
     const boardId = formData.get('boardId') as string;
     const threadId = formData.get('threadId') as string;
-
-    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
-    if (adminSecret !== SECRET) {
-        return { success: false, message: 'Invalid admin secret' };
-    }
 
     await updatePostStatus(postId, 'deleted');
     revalidatePath(`/${boardId}/${threadId}`);
@@ -143,15 +143,14 @@ export async function deletePostAction(formData: FormData) {
 }
 
 export async function restorePostAction(formData: FormData) {
+    const session = await getServerSession();
+    if (!session) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
     const postId = formData.get('postId') as string;
-    const adminSecret = formData.get('adminSecret') as string;
     const boardId = formData.get('boardId') as string;
     const threadId = formData.get('threadId') as string;
-
-    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
-    if (adminSecret !== SECRET) {
-        return { success: false, message: 'Invalid admin secret' };
-    }
 
     await updatePostStatus(postId, 'active');
     revalidatePath(`/${boardId}/${threadId}`);
@@ -159,14 +158,13 @@ export async function restorePostAction(formData: FormData) {
 }
 
 export async function deleteThreadAction(formData: FormData) {
+    const session = await getServerSession();
+    if (!session) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
     const threadId = formData.get('threadId') as string;
     const boardId = formData.get('boardId') as string;
-    const adminSecret = formData.get('adminSecret') as string;
-
-    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
-    if (adminSecret !== SECRET) {
-        return { success: false, message: 'Invalid admin secret' };
-    }
 
     await updateThreadStatus(threadId, 'deleted');
     revalidatePath(`/${boardId}`);
@@ -174,14 +172,13 @@ export async function deleteThreadAction(formData: FormData) {
 }
 
 export async function updateReportStatus(formData: FormData) {
+    const session = await getServerSession();
+    if (!session) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
     const reportId = formData.get('reportId') as string;
     const status = formData.get('status') as 'pending' | 'resolved' | 'dismissed';
-    const adminSecret = formData.get('adminSecret') as string;
-
-    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
-    if (adminSecret !== SECRET) {
-        return { success: false, message: 'Invalid admin secret' };
-    }
 
     const { updateReportStatus: dbUpdateReportStatus } = await import('@/data/db-actions');
     await dbUpdateReportStatus(reportId, status);
@@ -191,14 +188,13 @@ export async function updateReportStatus(formData: FormData) {
 }
 
 export async function toggleBoardStatusAction(formData: FormData) {
+    const session = await getServerSession();
+    if (!session) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
     const boardId = formData.get('boardId') as string;
     const status = formData.get('status') as 'active' | 'locked';
-    const adminSecret = formData.get('adminSecret') as string;
-
-    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
-    if (adminSecret !== SECRET) {
-        return { success: false, message: 'Invalid admin secret' };
-    }
 
     const { updateBoardStatus } = await import('@/data/db-actions');
     await updateBoardStatus(boardId, status);

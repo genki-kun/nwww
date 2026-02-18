@@ -14,15 +14,12 @@ import { deletePostAction, restorePostAction } from '@/app/actions';
 interface ThreadInteractiveViewProps {
     boardId: string;
     thread: any; // Allow partial for serialization optimization
-    adminSecret?: string;
+    isAdmin?: boolean;
 }
 
-export default function ThreadInteractiveView({ boardId, thread, adminSecret }: ThreadInteractiveViewProps) {
+export default function ThreadInteractiveView({ boardId, thread, isAdmin }: ThreadInteractiveViewProps) {
     const [replyTarget, setReplyTarget] = useState<number | null>(null);
     const [isWriteBarExpanded, setIsWriteBarExpanded] = useState(false);
-
-    const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || 'nwww-admin-2024';
-    const isAdmin = adminSecret === ADMIN_SECRET;
 
     // Record board visit for recommendation engine
     useEffect(() => {
@@ -75,7 +72,7 @@ export default function ThreadInteractiveView({ boardId, thread, adminSecret }: 
                     }}>
                         <span><strong>ADMIN MODE ACTIVE:</strong> Moderation tools are visible.</span>
                         <a
-                            href={`/admin?admin=${adminSecret}`}
+                            href="/admin"
                             style={{
                                 backgroundColor: '#ef4444',
                                 color: 'white',
@@ -114,7 +111,6 @@ export default function ThreadInteractiveView({ boardId, thread, adminSecret }: 
                                             }
                                         }}>
                                             <input type="hidden" name="postId" value={post.id} />
-                                            <input type="hidden" name="adminSecret" value={adminSecret} />
                                             <input type="hidden" name="boardId" value={boardId} />
                                             <input type="hidden" name="threadId" value={thread.id} />
                                             <button type="submit" style={{
