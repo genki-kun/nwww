@@ -38,7 +38,7 @@ export default function SparkAdmin() {
                 </button>
                 {lastRun && <p className={styles.status}>Last run: {lastRun}</p>}
                 <p className={styles.note}>
-                    *Simulates the "Every 3 Hours" auto-generation task.
+                    *Simulates the &quot;Every 3 Hours&quot; auto-generation task.
                 </p>
             </div>
         </div>

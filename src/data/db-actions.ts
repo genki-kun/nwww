@@ -85,24 +85,32 @@ export async function getArchivedThreads(boardId: string) {
     return threads.map(convertThread);
 }
 
-export async function getThread(boardId: string, threadId: string) {
-    const thread = await prisma.thread.findUnique({
-        where: { id: threadId },
-        include: {
-            posts: {
-                orderBy: { createdAt: 'asc' } // Posts in chronological order
-            },
-            board: true,
-        } // All status allowed (Archive should be readable)
-    });
+// Prisma types helper
+interface PrismaThread {
+    id: string;
+    title: string;
+    lastUpdated: Date;
+    postCount: number;
+    views: number;
+    tags: any;
+    aiAnalysis?: string | null;
+    isAiGenerated: boolean;
+    sourceUrl?: string | null;
+    createdAt: Date;
+    status: string;
+    posts?: PrismaPost[];
+}
 
-    if (!thread) return null;
-
-    return convertThread(thread);
+interface PrismaPost {
+    id: string;
+    author: string;
+    content: string;
+    createdAt: Date;
+    status: 'active' | 'deleted';
 }
 
 // Helper to convert Prisma Thread to App Thread (Date -> String, JSON string tags -> Array)
-function convertThread(thread: any) {
+function convertThread(thread: PrismaThread) {
     // With PostgreSQL Json type, tags come directly as an array or object
     const tags = Array.isArray(thread.tags) ? thread.tags : [];
 
@@ -111,7 +119,7 @@ function convertThread(thread: any) {
         lastUpdated: thread.lastUpdated.toISOString(),
         createdAt: thread.createdAt.toISOString(),
         tags: tags,
-        posts: thread.posts ? thread.posts.map((post: any) => ({
+        posts: thread.posts ? thread.posts.map((post: PrismaPost) => ({
             ...post,
             createdAt: post.createdAt.toISOString(),
             status: post.status,
@@ -263,7 +271,7 @@ export async function getAllRecentThreads(limit = 100) {
 export async function searchThreads(query: string, boardId?: string) {
     if (!query.trim()) return [];
 
-    const where: any = {
+    const where: Record<string, any> = {
         OR: [
             { title: { contains: query, mode: 'insensitive' } },
             { posts: { some: { content: { contains: query, mode: 'insensitive' } } } }

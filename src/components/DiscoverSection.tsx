@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { ThreadSummary } from './ThreadCard';
 import ThreadCard from './ThreadCard';
 import styles from './DiscoverSection.module.css';
@@ -38,9 +38,7 @@ export function recordBoardVisit(boardId: string) {
 }
 
 export default function DiscoverSection({ allThreads, excludeIds }: DiscoverSectionProps) {
-    const [threads, setThreads] = useState<ThreadWithBoard[]>([]);
-
-    useEffect(() => {
+    const threads = useMemo(() => {
         const excludeSet = new Set(excludeIds);
         const candidates = allThreads.filter(t => !excludeSet.has(t.id));
         const history = getBoardHistory();
@@ -48,8 +46,7 @@ export default function DiscoverSection({ allThreads, excludeIds }: DiscoverSect
         if (history.length === 0) {
             // No history: random shuffle
             const shuffled = [...candidates].sort(() => Math.random() - 0.5);
-            setThreads(shuffled.slice(0, 12));
-            return;
+            return shuffled.slice(0, 12);
         }
 
         // Score by board affinity: more recent visits = higher score
@@ -63,7 +60,7 @@ export default function DiscoverSection({ allThreads, excludeIds }: DiscoverSect
         });
 
         scored.sort((a, b) => b.score - a.score);
-        setThreads(scored.slice(0, 12).map(s => s.thread));
+        return scored.slice(0, 12).map(s => s.thread);
     }, [allThreads, excludeIds]);
 
     return (

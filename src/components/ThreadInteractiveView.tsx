@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Thread } from '@/data/mockBBS';
+import { Thread, Post } from '@/data/mockBBS';
 import PostBar from './PostBar';
 import ThreadSummarizer from './ThreadSummarizer';
 import PostContent from './PostContent';
@@ -14,7 +14,7 @@ import { deletePostAction, restorePostAction } from '@/app/actions';
 
 interface ThreadInteractiveViewProps {
     boardId: string;
-    thread: any; // Allow partial for serialization optimization
+    thread: Thread;
     isAdmin?: boolean;
 }
 
@@ -140,10 +140,6 @@ export default function ThreadInteractiveView({ boardId, thread, isAdmin }: Thre
                                             background: 'transparent',
                                             border: 'none',
                                             cursor: 'pointer',
-                                            color: 'var(--muted-foreground)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '0.25rem',
                                             fontSize: '0.8rem',
                                             padding: '0.25rem 0.5rem',
                                             borderRadius: '0.25rem'
