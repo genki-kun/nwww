@@ -11,15 +11,20 @@ async function main() {
     for (const board of MOCK_BOARDS) {
         console.log(`Creating board: ${board.name}`)
 
+        // Initial active boards
+        const INITIAL_ACTIVE_BOARDS = ['news-global', 'lounge-chat', 'hobby-pc'];
+        const status = INITIAL_ACTIVE_BOARDS.includes(board.id) ? 'active' : 'locked';
+
         // Create Board
         await prisma.board.upsert({
             where: { id: board.id },
-            update: {},
+            update: { status },
             create: {
                 id: board.id,
                 name: board.name,
                 description: board.description,
                 category: board.category,
+                status: status,
             },
         })
 
@@ -39,7 +44,7 @@ async function main() {
                     status: thread.status,
                     lastUpdated: new Date(thread.lastUpdated),
                     createdAt: new Date(thread.createdAt),
-                    tags: JSON.stringify(thread.tags),
+                    tags: thread.tags,
                     // AI fields default to false/null
                     boardId: board.id,
                 }

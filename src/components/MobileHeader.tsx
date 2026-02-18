@@ -137,6 +137,10 @@ export default function MobileHeader({ boards }: MobileHeaderProps) {
                 {/* Drawer Footer */}
                 <div className={styles.drawerFooter}>
                     <div className={styles.footerDivider} />
+                    <div className={styles.legalLinks}>
+                        <Link href="/tos" className={styles.legalLink} onClick={() => setIsOpen(false)}>利用規約</Link>
+                        <Link href="/privacy" className={styles.legalLink} onClick={() => setIsOpen(false)}>プライバシー</Link>
+                    </div>
                     <ThemeToggle />
                 </div>
             </nav>

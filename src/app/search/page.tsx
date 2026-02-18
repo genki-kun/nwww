@@ -1,3 +1,4 @@
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { searchThreads } from '@/data/db-actions';
 import { ArrowLeft, Search, Clock, Eye, MessageCircle } from 'lucide-react';
@@ -8,6 +9,22 @@ interface PageProps {
         q?: string;
         board?: string;
     }>;
+}
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+    const { q } = await searchParams;
+    const query = q?.trim() || '';
+
+    if (!query) {
+        return {
+            title: '検索',
+        };
+    }
+
+    return {
+        title: `検索: ${query}`,
+        description: `NWWW での「${query}」の検索結果。`,
+    };
 }
 
 export default async function SearchPage({ searchParams }: PageProps) {
@@ -53,8 +70,18 @@ export default async function SearchPage({ searchParams }: PageProps) {
 
                 {query && results.length === 0 && (
                     <div className={styles.empty}>
-                        <Search size={48} style={{ opacity: 0.3 }} />
-                        <p>該当するスレッドが見つかりませんでした</p>
+                        <Search size={64} strokeWidth={1} style={{ opacity: 0.2 }} />
+                        <div className={styles.emptyText}>
+                            <p>「<strong>{query}</strong>」に関するスレッドは見つかりませんでした。</p>
+                            <div className={styles.recommendations}>
+                                <p>他のキーワードで試してみるか、トップページで話題をチェックしてみてください。</p>
+                                <ul className={styles.recommendationList}>
+                                    <li><Link href="/" className={styles.recommendationItem}>トップへ戻る</Link></li>
+                                    <li><Link href="/search?q=ニュース" className={styles.recommendationItem}>ニュース</Link></li>
+                                    <li><Link href="/search?q=雑談" className={styles.recommendationItem}>雑談</Link></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 )}
 

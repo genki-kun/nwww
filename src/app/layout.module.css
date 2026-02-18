@@ -172,7 +172,27 @@
     padding: 24px;
     border-top: 1px solid var(--sidebar-border);
     display: flex;
+    flex-direction: column;
+    gap: 16px;
     justify-content: flex-start;
+}
+
+.legalLinks {
+    display: flex;
+    gap: 12px;
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+}
+
+.legalLink {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.legalLink:hover {
+    color: var(--color-text-primary);
+    text-decoration: underline;
 }
 
 .sidebar::-webkit-scrollbar {

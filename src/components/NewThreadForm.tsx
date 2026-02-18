@@ -8,9 +8,10 @@ import styles from './NewThreadForm.module.css';
 
 interface NewThreadFormProps {
     boardId: string;
+    variant?: 'default' | 'primary';
 }
 
-export default function NewThreadForm({ boardId }: NewThreadFormProps) {
+export default function NewThreadForm({ boardId, variant = 'default' }: NewThreadFormProps) {
     const router = useRouter();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
@@ -33,7 +34,10 @@ export default function NewThreadForm({ boardId }: NewThreadFormProps) {
         try {
             const res = await fetch('/api/thread/generate', {
                 method: 'POST',
-                body: JSON.stringify({ url: aiUrl }),
+                body: JSON.stringify({
+                    url: aiUrl,
+                    website_url_verification: (e.currentTarget as HTMLFormElement).elements.namedItem('website_url_verification')?.valueOf()
+                }),
                 headers: { 'Content-Type': 'application/json' }
             });
             const data = await res.json();
@@ -125,7 +129,7 @@ export default function NewThreadForm({ boardId }: NewThreadFormProps) {
                     </div>
                 )}
                 <button
-                    className={styles.triggerButton}
+                    className={variant === 'primary' ? styles.primaryTriggerButton : styles.triggerButton}
                     onClick={() => setIsOpen(true)}
                 >
                     新規スレッド作成
@@ -148,7 +152,7 @@ export default function NewThreadForm({ boardId }: NewThreadFormProps) {
                 ) : isSubmitting && mode === 'ai' ? (
                     <div className={styles.processingState}>
                         <Loader2 size={32} className={styles.spinner} />
-                        <p className={styles.processingText}>AIが記事を分析し、最適な板を選定しています...</p>
+                        <p className={styles.processingText}>NWWWが記事を分析し、最適な板を選定しています...</p>
                         <p className={styles.processingSub}>これには数秒かかる場合があります</p>
                     </div>
                 ) : (
@@ -194,7 +198,7 @@ export default function NewThreadForm({ boardId }: NewThreadFormProps) {
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
                                         disabled={isSubmitting}
-                                        placeholder="議論したいテーマを一言で"
+                                        placeholder="タイトルを入れてね"
                                     />
                                 </div>
 
@@ -209,7 +213,17 @@ export default function NewThreadForm({ boardId }: NewThreadFormProps) {
                                         onChange={(e) => setContent(e.target.value)}
                                         disabled={isSubmitting}
                                         rows={6}
-                                        placeholder="あなたの意見や、議論のきっかけとなる内容"
+                                        placeholder="コメントを書いてね"
+                                    />
+                                </div>
+
+                                {/* Honeypot field for anti-spam (invisible to users) */}
+                                <div style={{ display: 'none' }} aria-hidden="true">
+                                    <input
+                                        type="text"
+                                        name="website_url_verification"
+                                        autoComplete="off"
+                                        tabIndex={-1}
                                     />
                                 </div>
 
@@ -273,7 +287,7 @@ export default function NewThreadForm({ boardId }: NewThreadFormProps) {
                                         disabled={isSubmitting || !aiUrl.trim()}
                                     >
                                         <Sparkles size={18} />
-                                        {isSubmitting ? 'AIが生成中...' : '記事から作成'}
+                                        {isSubmitting ? 'NWWWが生成中...' : '記事から作成'}
                                     </button>
                                 </div>
                             </form>

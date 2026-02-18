@@ -2,8 +2,10 @@
 
 import { headers } from 'next/headers';
 import crypto from 'crypto';
-import { addPost, createThread } from '@/data/db-actions';
+import { addPost, createThread, updatePostStatus, updateThreadStatus } from '@/data/db-actions';
 import { revalidatePath } from 'next/cache';
+
+import { checkRateLimit } from '@/lib/rate-limit';
 
 function generateDailyId(ip: string): string {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
@@ -14,7 +16,6 @@ function generateDailyId(ip: string): string {
     const hash = crypto.createHash('sha256').update(raw).digest('base64');
 
     // Take first 9 chars and make it URL safe-ish or just alphanumeric
-    // Base64 can have +, /, =. Let's just take substring.
     return hash.substring(0, 9);
 }
 
@@ -23,6 +24,11 @@ export async function submitPost(formData: FormData) {
     const threadId = formData.get('threadId') as string;
     const content = formData.get('content') as string;
     const author = (formData.get('author') as string) || "名無しさん@ニュ〜";
+    const honeypot = formData.get('website_url_verification') as string;
+
+    if (honeypot) {
+        return { success: false, message: 'Spam detected' };
+    }
 
     if (!boardId || !threadId || !content) {
         return { success: false, message: 'Missing required fields' };
@@ -32,6 +38,12 @@ export async function submitPost(formData: FormData) {
     const headersList = await headers();
     const forwardedFor = headersList.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0] : '127.0.0.1';
+
+    // Rate Limit Check (5 seconds per post)
+    const canPost = await checkRateLimit(`post:${ip}`, 1, 5000);
+    if (!canPost) {
+        return { success: false, message: '投稿間隔が短すぎます。少し待ってから再度投稿してください。' };
+    }
 
     // Generate ID
     const userId = generateDailyId(ip);
@@ -47,6 +59,11 @@ export async function createNewThread(formData: FormData) {
     const boardId = formData.get('boardId') as string;
     const title = formData.get('title') as string;
     const content = formData.get('content') as string;
+    const honeypot = formData.get('website_url_verification') as string;
+
+    if (honeypot) {
+        return { success: false, message: 'Spam detected' };
+    }
 
     if (!boardId || !title || !content) {
         return { success: false, message: 'Missing required fields' };
@@ -56,6 +73,13 @@ export async function createNewThread(formData: FormData) {
     const headersList = await headers();
     const forwardedFor = headersList.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0] : '127.0.0.1';
+
+    // Rate Limit Check (60 seconds per thread)
+    const canCreate = await checkRateLimit(`thread:${ip}`, 1, 60000);
+    if (!canCreate) {
+        return { success: false, message: '次の方のために、スレッド作成は1分間に1回までとしています。' };
+    }
+
     const userId = generateDailyId(ip);
 
     const newThread = await createThread(boardId, title, content, userId);
@@ -80,6 +104,13 @@ export async function reportPost(formData: FormData) {
     const headersList = await headers();
     const forwardedFor = headersList.get('x-forwarded-for');
     const ip = forwardedFor ? forwardedFor.split(',')[0] : '127.0.0.1';
+
+    // Rate Limit Check (10 seconds per report)
+    const canReport = await checkRateLimit(`report:${ip}`, 1, 10000);
+    if (!canReport) {
+        return { success: false, message: '通報は10秒間に1回までとしています。' };
+    }
+
     const hashedIp = crypto.createHash('sha256').update(ip).digest('hex').substring(0, 16);
 
     const { default: prisma } = await import('@/lib/prisma');
@@ -93,4 +124,86 @@ export async function reportPost(formData: FormData) {
     });
 
     return { success: true, message: '通報を受け付けました' };
+}
+
+export async function deletePostAction(formData: FormData) {
+    const postId = formData.get('postId') as string;
+    const adminSecret = formData.get('adminSecret') as string;
+    const boardId = formData.get('boardId') as string;
+    const threadId = formData.get('threadId') as string;
+
+    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
+    if (adminSecret !== SECRET) {
+        return { success: false, message: 'Invalid admin secret' };
+    }
+
+    await updatePostStatus(postId, 'deleted');
+    revalidatePath(`/${boardId}/${threadId}`);
+    return { success: true };
+}
+
+export async function restorePostAction(formData: FormData) {
+    const postId = formData.get('postId') as string;
+    const adminSecret = formData.get('adminSecret') as string;
+    const boardId = formData.get('boardId') as string;
+    const threadId = formData.get('threadId') as string;
+
+    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
+    if (adminSecret !== SECRET) {
+        return { success: false, message: 'Invalid admin secret' };
+    }
+
+    await updatePostStatus(postId, 'active');
+    revalidatePath(`/${boardId}/${threadId}`);
+    return { success: true };
+}
+
+export async function deleteThreadAction(formData: FormData) {
+    const threadId = formData.get('threadId') as string;
+    const boardId = formData.get('boardId') as string;
+    const adminSecret = formData.get('adminSecret') as string;
+
+    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
+    if (adminSecret !== SECRET) {
+        return { success: false, message: 'Invalid admin secret' };
+    }
+
+    await updateThreadStatus(threadId, 'deleted');
+    revalidatePath(`/${boardId}`);
+    return { success: true };
+}
+
+export async function updateReportStatus(formData: FormData) {
+    const reportId = formData.get('reportId') as string;
+    const status = formData.get('status') as 'pending' | 'resolved' | 'dismissed';
+    const adminSecret = formData.get('adminSecret') as string;
+
+    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
+    if (adminSecret !== SECRET) {
+        return { success: false, message: 'Invalid admin secret' };
+    }
+
+    const { updateReportStatus: dbUpdateReportStatus } = await import('@/data/db-actions');
+    await dbUpdateReportStatus(reportId, status);
+
+    revalidatePath('/admin');
+    return { success: true };
+}
+
+export async function toggleBoardStatusAction(formData: FormData) {
+    const boardId = formData.get('boardId') as string;
+    const status = formData.get('status') as 'active' | 'locked';
+    const adminSecret = formData.get('adminSecret') as string;
+
+    const SECRET = process.env.ADMIN_SECRET || 'nwww-admin-2024';
+    if (adminSecret !== SECRET) {
+        return { success: false, message: 'Invalid admin secret' };
+    }
+
+    const { updateBoardStatus } = await import('@/data/db-actions');
+    await updateBoardStatus(boardId, status);
+
+    revalidatePath('/');
+    revalidatePath('/admin');
+    return { success: true };
 }

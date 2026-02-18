@@ -7,9 +7,14 @@ import styles from './PostContent.module.css';
 interface PostContentProps {
     content: string;
     posts: Post[];
+    isDeleted?: boolean;
 }
 
-export default function PostContent({ content, posts }: PostContentProps) {
+export default function PostContent({ content, posts, isDeleted }: PostContentProps) {
+    if (isDeleted) {
+        return <div className={styles.deletedText}>あぼーん</div>;
+    }
+
     // Split content by anchor pattern (>>NUMBER)
     // Regex matches: (>>\d+)
     const parts = content.split(/(>>\d+)/g);

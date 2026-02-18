@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Thread } from '@/data/mockBBS';
+import { ThreadSummary } from './ThreadCard';
 import ThreadCard from './ThreadCard';
 import styles from './DiscoverSection.module.css';
 
-type ThreadWithBoard = Thread & { boardId: string; boardName: string };
+type ThreadWithBoard = ThreadSummary & { boardId: string; boardName: string };
 
 interface DiscoverSectionProps {
     allThreads: ThreadWithBoard[];

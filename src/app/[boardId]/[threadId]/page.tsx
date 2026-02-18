@@ -4,17 +4,65 @@ import { getThread } from '@/data/db-actions';
 import { SourceCard } from '@/components/SourceCard';
 import ThreadInteractiveView from '@/components/ThreadInteractiveView';
 import styles from './page.module.css';
+import { Metadata } from 'next';
 
 interface PageProps {
     params: Promise<{
         boardId: string;
         threadId: string;
     }>;
+    searchParams: Promise<{
+        admin?: string;
+    }>;
 }
 
-export default async function ThreadPage({ params }: PageProps) {
-    const { boardId, threadId } = await params;
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+    const paramsPromise = params;
+    const { boardId, threadId } = await paramsPromise;
     const thread = await getThread(boardId, threadId);
+
+    if (!thread) {
+        return {
+            title: 'Thread Not Found - NWWW',
+        };
+    }
+
+    const title = thread.title;
+    const boardName = thread.board?.name || boardId;
+
+    const ogUrl = new URL(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/og`);
+    ogUrl.searchParams.set('title', title);
+    ogUrl.searchParams.set('boardName', boardName);
+
+    return {
+        title: `${title} - ${boardName} | NWWW`,
+        description: thread.aiAnalysis || thread.title,
+        openGraph: {
+            title: title,
+            images: [
+                {
+                    url: ogUrl.toString(),
+                    width: 1200,
+                    height: 630,
+                    alt: title,
+                },
+            ],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: title,
+            images: [ogUrl.toString()],
+        },
+    };
+}
+
+export default async function ThreadPage({ params, searchParams }: PageProps) {
+    const paramsPromise = params;
+    const searchParamsPromise = searchParams;
+
+    const { boardId, threadId } = await paramsPromise;
+    const thread = await getThread(boardId, threadId);
+    const { admin: adminSecret } = await searchParamsPromise;
 
     if (!thread) {
         notFound();
@@ -42,7 +90,25 @@ export default async function ThreadPage({ params }: PageProps) {
                 sourcePlatform={thread.sourcePlatform}
             />
 
-            <ThreadInteractiveView boardId={boardId} thread={thread} />
+            <ThreadInteractiveView
+                boardId={boardId}
+                thread={{
+                    id: thread.id,
+                    title: thread.title,
+                    postCount: thread.postCount,
+                    status: thread.status,
+                    aiSummary: thread.aiSummary,
+                    posts: thread.posts.map((p: any) => ({
+                        id: p.id,
+                        author: p.author,
+                        content: p.content,
+                        createdAt: p.createdAt,
+                        userId: p.userId,
+                        status: p.status
+                    }))
+                } as any}
+                adminSecret={adminSecret}
+            />
         </div>
     );
 }

@@ -1,0 +1,136 @@
+.container {
+    padding: 1rem;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+}
+
+.header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.empty {
+    padding: 4rem;
+    text-align: center;
+    color: var(--muted-foreground);
+    background: var(--card);
+    border-radius: 1rem;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.reportCard {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.reportHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reasonTag {
+    background: #fee2e2;
+    color: #ef4444;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.reportDate {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.postContext {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.contextHeader {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+}
+
+.postBox {
+    background: var(--accent);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px dashed var(--border);
+}
+
+.postMeta {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    margin-bottom: 0.5rem;
+}
+
+.postContent {
+    font-size: 0.9rem;
+    color: var(--foreground);
+    white-space: pre-wrap;
+}
+
+.reportDetail {
+    font-size: 0.85rem;
+    background: var(--color-bg-subtle);
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.deleteBtn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.deleteBtn:hover {
+    opacity: 0.9;
+}
+
+.dismissBtn {
+    background: transparent;
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    padding: 0.6rem 1.2rem;
+    border-radius: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dismissBtn:hover {
+    background: var(--accent);
+}

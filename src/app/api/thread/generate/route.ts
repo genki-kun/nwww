@@ -69,7 +69,11 @@ async function scrapeTwitter(url: string): Promise<{ title: string; content: str
 
 export async function POST(req: Request) {
     try {
-        const { url } = await req.json();
+        const { url, website_url_verification } = await req.json();
+
+        if (website_url_verification) {
+            return NextResponse.json({ error: 'Spam detected' }, { status: 400 });
+        }
 
         if (!url) {
             return NextResponse.json({ error: 'URL is required' }, { status: 400 });
@@ -111,8 +115,9 @@ export async function POST(req: Request) {
             );
         }
 
-        // 2. Get available boards for categorization
+        // 2. Get available boards for categorization (only active ones)
         const boards = await prisma.board.findMany({
+            where: { status: 'active' },
             select: { id: true, name: true, description: true }
         });
         const boardsList = boards.map((b: { id: string; name: string; description: string | null }) =>
@@ -141,7 +146,7 @@ export async function POST(req: Request) {
     ## 文体・トーンの指示 (重要)
     - **報道機関のような中立的・丁寧な口調は厳禁**です。「〜ですね」「〜しましょう」は排除してください。
     - **断定調**、**倒置法**、**ネットスラング**（「〜な件」「〜不可避」「【悲報】」「【朗報】」など）を自然に混ぜてください。
-    - 記事の核心を突きつつ、少し**煽り**や**皮肉**を効かせた、斜に構えた視点で書いてください。
+    - 記事の核心を突き、一言で「要するにこういうことだろ」と断じるような、短くキレのある文体にしてください。
 
     ## 重要: AI要約 (aiAnalysis) の制約
     - 必ず **3行** の箇条書きで構成してください。
@@ -153,16 +158,13 @@ export async function POST(req: Request) {
     ### 1. Title (スレッドタイトル)
     - 30文字以内。
     - 記事のタイトルをそのまま使うのではなく、ねらーが思わずクリックしたくなるように改変してください。
-    - 例:
-        - 「【悲報】〇〇さん、とんでもない発言をしてしまうｗｗｗ」
-        - 「政府「〇〇します」→ 国民「ファッ！？」」
-        - 「【画像】最新の〇〇、限界突破」
 
     ### 2. Initial Post Content (>>1 本文)
-    - 記事の**客観的な要約**（3〜5行程度）を最初に書いてください。
-    - その後に、スレ立て記者（あなた）としての**一言コメント**（煽り、ボヤキ、問題提起、皮肉など）を付け加えてください。
-    - 改行を適度に入れ、スマホでも読みやすくしてください。
-    - 締めの挨拶は不要です。「お前らどう思う？」等の問いかけはOK。
+    - **極めて簡潔に**書いてください。ダラダラとした説明は不要です。
+    - 記事の**客観的な要約**（2〜3行程度、短い文で）を最初に書いてください。
+    - その後に、スレ立て記者（あなた）としての**一言コメント**（煽り、ボヤキ、皮肉など）を1行〜2行程度で添えてください。
+    - **「お前らどう思う？」や「議論しましょう」といった、住人に媚びるような問いかけは一切不要です。** 記者の独り言として完結させてください。
+    - スマホでも1画面に収まる程度の分量を意識してください。
 
     ## 出力フォーマット (JSONのみ)
     {
@@ -170,7 +172,7 @@ export async function POST(req: Request) {
       "boardId": "以下のリストから最も適切なIDを選択",
       "tags": ["タグ1", "タグ2", "タグ3"],
       "aiAnalysis": "3行箇条書き（各行10文字以内）。",
-      "initialPostContent": "スレ主としての書き込み。\\n\\n要約部分...\\n\\n(一言コメント)..."
+      "initialPostContent": "要約部分...\\n\\n(一言コメント)..."
     }
 
     ## 選択可能なBoard IDリスト
@@ -265,8 +267,8 @@ export async function POST(req: Request) {
                             ? data.aiAnalysis
                             : Array.isArray(data.aiAnalysis)
                                 ? data.aiAnalysis.join('\n')
-                                : JSON.stringify(data.aiAnalysis),
-                        tags: JSON.stringify(data.tags || []),
+                                : String(data.aiAnalysis), // Fallback to String() instead of JSON.stringify()
+                        tags: data.tags || [],
                         views: 0,
                         postCount: 1,
                         momentum: 1000,
@@ -277,8 +279,8 @@ export async function POST(req: Request) {
                 await tx.post.create({
                     data: {
                         content: data.initialPostContent,
-                        author: 'AI記者 (NWWW Press)',
-                        userId: 'AI_AGENT',
+                        author: '@ニュ〜くんはAIなのです',
+                        userId: 'NWWW_KUN_',
                         threadId: thread.id,
                     }
                 });

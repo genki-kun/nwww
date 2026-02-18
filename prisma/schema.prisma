@@ -6,8 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Board {
@@ -15,6 +16,7 @@ model Board {
   name        String
   description String
   category    String
+  status      String   @default("active") // 'active' | 'locked'
   threads     Thread[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -38,8 +40,8 @@ model Thread {
   sourcePlatform String? // 'twitter', 'news', 'youtube', etc.
   aiAnalysis    String?  // Summary or analysis by AI
 
-  // Tags (Stored as JSON string in SQLite)
-  tags          String   @default("[]") 
+  // Tags (Stored as JSON in PostgreSQL)
+  tags          Json     @default("[]") 
 
   // Relations
   boardId       String
@@ -61,6 +63,7 @@ model Post {
   tripcode      String?  // For tripcode feature
   isAiGenerated Boolean  @default(false)
   likes         Int      @default(0)
+  status        String   @default("active") // 'active' | 'deleted'
 
   // Relations
   threadId      String
@@ -84,4 +87,10 @@ model Report {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model RateLimit {
+  key       String   @id // e.g. "post:hashed_ip" or "thread:hashed_ip"
+  count     Int      @default(0)
+  lastHit   DateTime @default(now())
 }

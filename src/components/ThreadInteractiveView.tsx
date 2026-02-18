@@ -9,15 +9,20 @@ import ReportButton from './ReportButton';
 import { recordBoardVisit } from './DiscoverSection';
 import styles from '@/app/[boardId]/[threadId]/page.module.css'; // Importing from page module to reuse styles
 import { MessageSquareReply } from 'lucide-react';
+import { deletePostAction, restorePostAction } from '@/app/actions';
 
 interface ThreadInteractiveViewProps {
     boardId: string;
-    thread: Thread;
+    thread: any; // Allow partial for serialization optimization
+    adminSecret?: string;
 }
 
-export default function ThreadInteractiveView({ boardId, thread }: ThreadInteractiveViewProps) {
+export default function ThreadInteractiveView({ boardId, thread, adminSecret }: ThreadInteractiveViewProps) {
     const [replyTarget, setReplyTarget] = useState<number | null>(null);
     const [isWriteBarExpanded, setIsWriteBarExpanded] = useState(false);
+
+    const ADMIN_SECRET = process.env.NEXT_PUBLIC_ADMIN_SECRET || 'nwww-admin-2024';
+    const isAdmin = adminSecret === ADMIN_SECRET;
 
     // Record board visit for recommendation engine
     useEffect(() => {
@@ -53,19 +58,82 @@ export default function ThreadInteractiveView({ boardId, thread }: ThreadInterac
                 `}</style>
 
                 <ThreadSummarizer threadId={thread.id} initialSummary={thread.aiSummary} postCount={thread.postCount} />
+
+                {isAdmin && (
+                    <div style={{
+                        padding: '1rem',
+                        backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                        border: '1px solid rgba(255, 0, 0, 0.2)',
+                        borderRadius: '0.5rem',
+                        marginBottom: '1rem',
+                        color: '#ef4444',
+                        fontSize: '0.8rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '0.5rem'
+                    }}>
+                        <span><strong>ADMIN MODE ACTIVE:</strong> Moderation tools are visible.</span>
+                        <a
+                            href={`/admin?admin=${adminSecret}`}
+                            style={{
+                                backgroundColor: '#ef4444',
+                                color: 'white',
+                                padding: '4px 12px',
+                                borderRadius: '4px',
+                                textDecoration: 'none',
+                                fontWeight: 'bold'
+                            }}
+                        >
+                            通報を確認する
+                        </a>
+                    </div>
+                )}
+
                 {thread.posts.length === 0 ? (
                     <p className={styles.empty}>まだ投稿がありません。</p>
                 ) : (
-                    thread.posts.map((post, index) => (
-                        <article key={post.id} className={styles.post} id={`post-${index + 1}`}>
+                    thread.posts.map((post: any, index: number) => (
+                        <article key={post.id} className={`${styles.post} ${post.status === 'deleted' ? styles.deleted : ''}`} id={`post-${index + 1}`}
+                            style={post.status === 'deleted' ? { opacity: 0.6 } : {}}
+                        >
                             <div className={styles.postHeader}>
                                 <span className={styles.postIndex}>{index + 1}</span>
                                 <span className={styles.author}>{post.author}</span>
                                 <span className={styles.date} suppressHydrationWarning>{new Date(post.createdAt).toLocaleString()}</span>
                                 <span className={styles.id}>ID: {post.userId || '???'}</span>
 
+                                {/* Admin Menu */}
+                                {isAdmin && (
+                                    <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+                                        <form action={async (formData) => {
+                                            if (post.status === 'deleted') {
+                                                await restorePostAction(formData);
+                                            } else {
+                                                await deletePostAction(formData);
+                                            }
+                                        }}>
+                                            <input type="hidden" name="postId" value={post.id} />
+                                            <input type="hidden" name="adminSecret" value={adminSecret} />
+                                            <input type="hidden" name="boardId" value={boardId} />
+                                            <input type="hidden" name="threadId" value={thread.id} />
+                                            <button type="submit" style={{
+                                                fontSize: '0.7rem',
+                                                padding: '2px 8px',
+                                                borderRadius: '4px',
+                                                border: '1px solid #ef4444',
+                                                background: post.status === 'deleted' ? '#ef4444' : 'transparent',
+                                                color: post.status === 'deleted' ? 'white' : '#ef4444',
+                                                cursor: 'pointer'
+                                            }}>
+                                                {post.status === 'deleted' ? 'RESTORE' : 'DELETE'}
+                                            </button>
+                                        </form>
+                                    </div>
+                                )}
+
                                 {/* Reply Button */}
-                                {thread.postCount < 1000 && thread.status !== 'filled' && (
+                                {!isAdmin && thread.postCount < 1000 && thread.status !== 'filled' && post.status !== 'deleted' && (
                                     <button
                                         onClick={() => handleReply(index + 1)}
                                         className="ml-auto text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
@@ -88,10 +156,10 @@ export default function ThreadInteractiveView({ boardId, thread }: ThreadInterac
                                         <span>返信</span>
                                     </button>
                                 )}
-                                <ReportButton postId={post.id} />
+                                {post.status !== 'deleted' && <ReportButton postId={post.id} />}
                             </div>
                             <div className={styles.postContent}>
-                                <PostContent content={post.content} posts={thread.posts} />
+                                <PostContent content={post.content} posts={thread.posts} isDeleted={post.status === 'deleted'} />
                             </div>
                         </article>
                     ))

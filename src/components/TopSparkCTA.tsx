@@ -40,13 +40,22 @@ export default function TopSparkCTA({ boards }: TopSparkCTAProps) {
         e.preventDefault();
         if (!url.trim()) return;
 
+        const honeypot = (e.currentTarget as HTMLFormElement).elements.namedItem('website_url_verification') as HTMLInputElement;
+        if (honeypot?.value) {
+            console.warn('Spam detected via Honeypot');
+            return;
+        }
+
         setIsSubmitting(true);
         setError(null);
 
         try {
             const res = await fetch('/api/thread/generate', {
                 method: 'POST',
-                body: JSON.stringify({ url }),
+                body: JSON.stringify({
+                    url,
+                    website_url_verification: (e.currentTarget as HTMLFormElement).elements.namedItem('website_url_verification')?.valueOf()
+                }),
                 headers: { 'Content-Type': 'application/json' }
             });
             const data = await res.json();
@@ -104,7 +113,7 @@ export default function TopSparkCTA({ boards }: TopSparkCTAProps) {
                 ) : isSubmitting ? (
                     <div className={styles.processingState}>
                         <Loader2 size={32} className={styles.spinner} />
-                        <p className={styles.processingText}>AIが記事を分析し、最適な板を選定しています...</p>
+                        <p className={styles.processingText}>NWWWが記事を分析し、最適な板を選定しています...</p>
                         <p className={styles.processingSub}>これには数秒かかる場合があります</p>
                     </div>
                 ) : (
@@ -113,11 +122,8 @@ export default function TopSparkCTA({ boards }: TopSparkCTAProps) {
                             <div className={styles.titleArea}>
                                 <h2 className={styles.title}>
                                     <Sparkles className={styles.titleIcon} size={24} />
-                                    AIスレッド生成 (Beta)
+                                    NWWWスレッド生成 (Beta)
                                 </h2>
-                                <p className={styles.description}>
-                                    記事のURLを入力すると、AIが内容を分析し、最適な板を選んでスレッドを自動作成します。
-                                </p>
                             </div>
                             <button className={styles.closeButton} onClick={handleClose}>
                                 <X size={24} />
@@ -148,6 +154,16 @@ export default function TopSparkCTA({ boards }: TopSparkCTAProps) {
                                         <span>{error}</span>
                                     </div>
                                 )}
+                            </div>
+
+                            {/* Honeypot field for anti-spam (invisible to users) */}
+                            <div style={{ display: 'none' }} aria-hidden="true">
+                                <input
+                                    type="text"
+                                    name="website_url_verification"
+                                    autoComplete="off"
+                                    tabIndex={-1}
+                                />
                             </div>
 
                             <div className={styles.actions}>

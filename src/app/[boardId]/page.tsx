@@ -1,4 +1,5 @@
 
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getBoard } from '@/data/db-actions';
@@ -15,9 +16,29 @@ interface PageProps {
     }>;
 }
 
-export default async function BoardPage({ params, searchParams }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
     const { boardId } = await params;
-    const { page: pageStr } = await searchParams;
+    const board = await getBoard(boardId);
+
+    if (!board) {
+        return {
+            title: '板が見つかりません',
+        };
+    }
+
+    return {
+        title: board.name,
+        description: `${board.name}板の公式スレッド一覧。${board.description}`,
+    };
+}
+
+export default async function BoardPage({ params, searchParams }: PageProps) {
+    const paramsPromise = params;
+    const searchParamsPromise = searchParams;
+
+    const { boardId } = await paramsPromise;
+    const { page: pageStr } = await searchParamsPromise;
+
     const page = Math.max(1, parseInt(pageStr || '1', 10));
     const board = await getBoard(boardId, page);
 
@@ -66,8 +87,15 @@ export default async function BoardPage({ params, searchParams }: PageProps) {
 
                 <div className={styles.threadList}>
                     {board.threads.length === 0 ? (
-                        <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--muted-foreground)' }}>
-                            <p>スレッドがありません</p>
+                        <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>
+                                <MessageCircle size={64} strokeWidth={1} />
+                            </div>
+                            <p className={styles.emptyText}>
+                                まだスレッドがありません。<br />
+                                最初のスレッドを作成してみませんか？
+                            </p>
+                            <NewThreadForm boardId={boardId} variant="primary" />
                         </div>
                     ) : (
                         board.threads.map((thread) => (

@@ -5,8 +5,10 @@ import DiscoverSection from '@/components/DiscoverSection';
 import TopSparkCTA from '@/components/TopSparkCTA';
 
 export default async function Home() {
-  const allThreadsWithBoard = await getAllThreads();
-  const boards = await getBoards();
+  const [allThreadsWithBoard, boards] = await Promise.all([
+    getAllThreads(),
+    getBoards()
+  ]);
 
   // 1. WHAT'S NEW: Sort by createdAt desc, take 10
   const newThreads = [...allThreadsWithBoard]
@@ -28,6 +30,17 @@ export default async function Home() {
     ...newThreads.map(t => t.id),
     ...pickUpThreads.map(t => t.id)
   ];
+
+  // Optimize serialization: Only pass fields needed by DiscoverSection/ThreadCard
+  const threadsForClient = allThreadsWithBoard.map(t => ({
+    id: t.id,
+    title: t.title,
+    postCount: t.postCount,
+    lastUpdated: t.lastUpdated,
+    boardName: t.boardName,
+    boardId: t.boardId,
+    createdAt: t.createdAt
+  }));
 
   return (
     <main className={styles.main}>
@@ -81,7 +94,7 @@ export default async function Home() {
           <p className={styles.sectionSub}>まだ知らないスレッドを発見</p>
         </div>
         <DiscoverSection
-          allThreads={allThreadsWithBoard}
+          allThreads={threadsForClient}
           excludeIds={usedIds}
         />
       </section>

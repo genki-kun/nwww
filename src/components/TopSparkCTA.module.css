@@ -1,9 +1,5 @@
 /* ─── Trigger Button ─── */
 /* ─── Trigger Button (FAB) ─── */
-.triggerButtonWrapper {
-    /* No layout needed for fixed element */
-}
-
 .triggerButton {
     position: fixed;
     bottom: 32px;

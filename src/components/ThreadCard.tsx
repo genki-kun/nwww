@@ -4,8 +4,18 @@ import styles from './ThreadCard.module.css';
 import { getRelativeTime } from '@/utils/time';
 import { Clock } from 'lucide-react';
 
+export interface ThreadSummary {
+    id: string;
+    title: string;
+    postCount: number;
+    lastUpdated: string;
+    createdAt?: string;
+    status?: string;
+    aiSummary?: string;
+}
+
 interface ThreadCardProps {
-    thread: Thread;
+    thread: ThreadSummary;
     boardName: string;
     boardId: string;
     variant?: 'horizontal' | 'grid' | 'list';

@@ -1,0 +1,99 @@
+.container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--card);
+    border-radius: 1rem;
+    border: 1px solid rgba(var(--foreground-rgb), 0.1);
+}
+
+.header {
+    margin-bottom: 1.5rem;
+}
+
+.header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.card {
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    background: var(--background);
+    border: 1px solid rgba(var(--foreground-rgb), 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1rem;
+    transition: all 0.2s;
+}
+
+.locked {
+    opacity: 0.6;
+    background: var(--accent);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.category {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    text-transform: uppercase;
+}
+
+.name {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.id {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.unlockBtn,
+.lockBtn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.unlockBtn {
+    background: var(--foreground);
+    color: var(--background);
+}
+
+.lockBtn {
+    background: transparent;
+    border: 1px solid rgba(var(--foreground-rgb), 0.2);
+    color: var(--foreground);
+}
+
+.unlockBtn:hover,
+.lockBtn:hover {
+    opacity: 0.8;
+}
+
+.unlockBtn:disabled,
+.lockBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

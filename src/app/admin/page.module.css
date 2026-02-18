@@ -1,0 +1,35 @@
+.container {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.nav {
+    margin-bottom: 2rem;
+}
+
+.backLink {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.header {
+    margin-bottom: 3rem;
+}
+
+.adminBadge {
+    display: inline-block;
+    background: #ef4444;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+}

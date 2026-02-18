@@ -6,6 +6,7 @@ export interface Post {
     createdAt: string;
     userId?: string; // Anonymous ID
     likes: number;
+    status?: 'active' | 'deleted';
 }
 
 export interface Thread {
@@ -56,6 +57,7 @@ export let MOCK_BOARDS: Board[] = [
                         content: "うわあああああああ逝ったああああああああああ",
                         createdAt: "2026-02-15T23:45:00",
                         likes: 0,
+                        status: 'active',
                     }
                 ],
             }
@@ -84,6 +86,7 @@ export let MOCK_BOARDS: Board[] = [
                         content: "中二病時代のノートが見つかったんだが、死にたい",
                         createdAt: "2026-02-15T18:00:00",
                         likes: 15,
+                        status: 'active',
                     }
                 ],
             },
@@ -104,6 +107,7 @@ export let MOCK_BOARDS: Board[] = [
                         content: "もう俺らの仕事なくなるんじゃね？マジで。",
                         createdAt: "2026-02-14T15:00:00",
                         likes: 8,
+                        status: 'active',
                     }
                 ],
             }
@@ -132,6 +136,7 @@ export let MOCK_BOARDS: Board[] = [
                         content: "付き合って3ヶ月。20代後半です。アクセか？コスメか？",
                         createdAt: "2026-02-15T10:00:00",
                         likes: 3,
+                        status: 'active',
                     }
                 ],
             }

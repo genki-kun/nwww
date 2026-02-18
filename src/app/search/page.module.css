@@ -109,9 +109,47 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    padding: 3rem 0;
+    gap: 1.5rem;
+    padding: 6rem 1rem;
+    background: var(--card);
+    border-radius: 1rem;
+    border: 1px solid rgba(var(--border-rgb), 0.1);
+    text-align: center;
+}
+
+.emptyText {
+    font-size: 1rem;
     color: var(--muted-foreground);
+    line-height: 1.6;
+}
+
+.recommendations {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--muted-foreground);
+}
+
+.recommendationList {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    list-style: none;
+    padding: 0;
+}
+
+.recommendationItem {
+    padding: 0.25rem 0.75rem;
+    background: var(--accent);
+    border-radius: 9999px;
+    color: var(--foreground);
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+
+.recommendationItem:hover {
+    opacity: 0.8;
 }
 
 .threadList {

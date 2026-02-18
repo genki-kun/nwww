@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { Noto_Sans_JP } from 'next/font/google';
-import { getBoards } from '@/data/mockBBS';
+import { getBoards } from '@/data/db-actions';
 import BoardList from '@/components/BoardList';
 import AIInsights from '@/components/AIInsights';
 import SparkAdmin from '@/components/SparkAdmin';
@@ -21,8 +21,24 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "NWWW - The New World Wide Web (Beta)",
-  description: "AI時代の現代版BBS",
+  title: {
+    template: '%s | NWWW - The New World Wide Web',
+    default: 'NWWW - The New World Wide Web (Beta)',
+  },
+  description: "AI時代の現代版匿名掲示板。AIレポーター「ニュ〜くん」による最新ニュースのスレッド生成や、AIによる要約機能を備えた、知の交差点となる次世代のBBS。",
+  metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
+  openGraph: {
+    title: 'NWWW - The New World Wide Web',
+    description: "AI時代の現代版匿名掲示板。知の交差点。",
+    siteName: 'NWWW',
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'NWWW - The New World Wide Web',
+    description: "AI時代の現代版匿名掲示板。知の交差点。",
+  },
 };
 
 // Inline script to prevent flash of wrong theme
@@ -80,6 +96,10 @@ export default async function RootLayout({
                 <BoardList boards={boards} />
               </div>
               <div className={styles.sidebarFooter}>
+                <div className={styles.legalLinks}>
+                  <Link href="/tos" className={styles.legalLink}>利用規約</Link>
+                  <Link href="/privacy" className={styles.legalLink}>プライバシー</Link>
+                </div>
                 <ThemeToggle />
               </div>
             </aside>

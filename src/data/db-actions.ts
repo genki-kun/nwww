@@ -7,10 +7,12 @@ import { unstable_cache } from 'next/cache'; // DB負荷軽減のためキャッ
 // ここで独自に定義しなおすか、Prismaの型を拡張します。
 // 今回はコンポーネント変更を最小限にするため、戻り値をMockBBS互換に変換します。
 
-export async function getBoards() {
+export async function getBoards(includeLocked = false) {
     const boards = await prisma.board.findMany({
+        where: includeLocked ? {} : { status: 'active' },
         include: {
             threads: {
+                where: { status: 'active' },
                 orderBy: { lastUpdated: 'desc' },
                 take: 5, // Top page only needs recent threads
                 include: {
@@ -101,12 +103,8 @@ export async function getThread(boardId: string, threadId: string) {
 
 // Helper to convert Prisma Thread to App Thread (Date -> String, JSON string tags -> Array)
 function convertThread(thread: any) {
-    let tags: string[] = [];
-    try {
-        tags = JSON.parse(thread.tags || '[]');
-    } catch (e) {
-        tags = [];
-    }
+    // With PostgreSQL Json type, tags come directly as an array or object
+    const tags = Array.isArray(thread.tags) ? thread.tags : [];
 
     return {
         ...thread,
@@ -116,6 +114,7 @@ function convertThread(thread: any) {
         posts: thread.posts ? thread.posts.map((post: any) => ({
             ...post,
             createdAt: post.createdAt.toISOString(),
+            status: post.status,
         })) : [],
         // Add AI fields if needed
         isAiGenerated: thread.isAiGenerated,
@@ -194,7 +193,7 @@ export async function createThread(boardId: string, title: string, content: stri
                 postCount: 1, // First post
                 views: 0,
                 momentum: 100, // Initial momentum
-                tags: '[]', // Empty tags for new manual thread
+                tags: [], // Empty tags for new manual thread
             }
         });
 
@@ -266,8 +265,8 @@ export async function searchThreads(query: string, boardId?: string) {
 
     const where: any = {
         OR: [
-            { title: { contains: query } },
-            { posts: { some: { content: { contains: query } } } }
+            { title: { contains: query, mode: 'insensitive' } },
+            { posts: { some: { content: { contains: query, mode: 'insensitive' } } } }
         ]
     };
 
@@ -293,4 +292,80 @@ export async function searchThreads(query: string, boardId?: string) {
         boardName: t.board.name,
         boardId: t.board.id
     }));
+}
+
+// Administrative Actions
+export async function updatePostStatus(postId: string, status: 'active' | 'deleted') {
+    const post = await prisma.post.update({
+        where: { id: postId },
+        data: { status }
+    });
+
+    // Recalculate momentum or other stats if needed
+
+    return post;
+}
+
+export async function updateThreadStatus(threadId: string, status: 'active' | 'deleted' | 'archived' | 'filled') {
+    const thread = await prisma.thread.update({
+        where: { id: threadId },
+        data: { status }
+    });
+
+    return thread;
+}
+
+// Reports management
+export async function getReports(limit = 100) {
+    const reports = await prisma.report.findMany({
+        where: {
+            status: 'pending'
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        take: limit,
+        include: {
+            post: {
+                include: {
+                    thread: {
+                        include: {
+                            board: true
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    return reports.map(report => ({
+        ...report,
+        createdAt: report.createdAt.toISOString(),
+        post: {
+            ...report.post,
+            createdAt: report.post.createdAt.toISOString(),
+            threadTitle: report.post.thread.title,
+            boardName: report.post.thread.board.name,
+            threadId: report.post.thread.id,
+            boardId: report.post.thread.board.id,
+        }
+    }));
+}
+
+export async function updateReportStatus(reportId: string, status: 'pending' | 'resolved' | 'dismissed') {
+    const report = await prisma.report.update({
+        where: { id: reportId },
+        data: { status }
+    });
+
+    return report;
+}
+
+export async function updateBoardStatus(boardId: string, status: 'active' | 'locked') {
+    const board = await prisma.board.update({
+        where: { id: boardId },
+        data: { status }
+    });
+
+    return board;
 }

@@ -27,6 +27,12 @@ export default function PostForm({ boardId, threadId }: PostFormProps) {
         formData.append('content', content);
         formData.append('author', author);
 
+        // Add Honeypot if present in form
+        const honeypot = (e.currentTarget as HTMLFormElement).elements.namedItem('website_url_verification') as HTMLInputElement;
+        if (honeypot) {
+            formData.append('website_url_verification', honeypot.value);
+        }
+
         const result = await submitPost(formData);
 
         if (result.success) {
@@ -61,6 +67,17 @@ export default function PostForm({ boardId, threadId }: PostFormProps) {
                     rows={4}
                     disabled={isSubmitting}
                 />
+
+                {/* Honeypot field for anti-spam (invisible to users) */}
+                <div style={{ display: 'none' }} aria-hidden="true">
+                    <input
+                        type="text"
+                        name="website_url_verification"
+                        autoComplete="off"
+                        tabIndex={-1}
+                    />
+                </div>
+
                 <div className={styles.actions}>
                     <button
                         type="submit"
