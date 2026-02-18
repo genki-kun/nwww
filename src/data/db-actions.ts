@@ -109,13 +109,15 @@ interface PrismaThread {
     postCount: number;
     views: number;
     tags: any;
-    aiAnalysis?: string | null;
+    aiAnalysis: string | null;
     isAiGenerated: boolean;
-    sourceUrl?: string | null;
+    sourceUrl: string | null;
+    sourceTitle: string | null;
+    sourcePlatform: string | null;
     createdAt: Date;
     status: string;
     posts?: PrismaPost[];
-      board?: any;
+    board?: any;
 }
 
 interface PrismaPost {
