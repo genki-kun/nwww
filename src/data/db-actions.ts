@@ -85,6 +85,22 @@ export async function getArchivedThreads(boardId: string) {
     return threads.map(convertThread);
 }
 
+export async function getThread(boardId: string, threadId: string) {
+    const thread = await prisma.thread.findUnique({
+        where: { id: threadId },
+        include: {
+            posts: {
+                orderBy: { createdAt: 'asc' } // Posts in chronological order
+            },
+            board: true,
+        } // All status allowed (Archive should be readable)
+    });
+
+    if (!thread) return null;
+
+    return convertThread(thread);
+}
+
 // Prisma types helper
 interface PrismaThread {
     id: string;
