@@ -8,7 +8,7 @@ const SUMMARY_THRESHOLDS = [20, 50, 100, 200, 500];
 
 interface ThreadSummarizerProps {
     threadId: string;
-    initialSummary?: string;
+    initialSummary?: string | null;
     postCount: number;
 }
 

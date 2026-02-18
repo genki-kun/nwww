@@ -127,6 +127,7 @@ interface PrismaPost {
     content: string;
     createdAt: Date;
     status: string;
+    likes: number;
 }
 
 // Helper to convert Prisma Thread to App Thread (Date -> String, JSON string tags -> Array)
@@ -143,6 +144,7 @@ function convertThread(thread: PrismaThread) {
             ...post,
             createdAt: post.createdAt.toISOString(),
             status: post.status,
+            likes: post.likes,
         })) : [],
         // Add AI fields if needed
         isAiGenerated: thread.isAiGenerated,

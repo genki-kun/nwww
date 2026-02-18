@@ -11,7 +11,7 @@ export interface ThreadSummary {
     lastUpdated: string;
     createdAt?: string;
     status?: string;
-    aiSummary?: string;
+    aiSummary?: string | null;
 }
 
 interface ThreadCardProps {

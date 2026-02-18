@@ -6,7 +6,7 @@ export interface Post {
     createdAt: string;
     userId?: string; // Anonymous ID
     likes: number;
-    status?: 'active' | 'deleted';
+    status?: string;
 }
 
 export interface Thread {
@@ -16,12 +16,17 @@ export interface Thread {
     postCount: number;
     views: number;
     tags: string[]; // Added tags
-    aiSummary?: string;
+    aiSummary?: string | null;
+    aiAnalysis?: string | null;
+    isAiGenerated?: boolean;
+    sourceUrl?: string | null;
+    sourceTitle?: string | null;
+    sourcePlatform?: string | null;
     posts: Post[];
     // Growth & Selection fields
     createdAt: string;
     momentum: number;
-    status: 'active' | 'archived' | 'filled';
+    status: string;
 }
 
 export interface Board {
