@@ -106,7 +106,7 @@ interface PrismaPost {
     author: string;
     content: string;
     createdAt: Date;
-    status: 'active' | 'deleted';
+    status: string;
 }
 
 // Helper to convert Prisma Thread to App Thread (Date -> String, JSON string tags -> Array)
