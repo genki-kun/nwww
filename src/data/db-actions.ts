@@ -115,6 +115,7 @@ interface PrismaThread {
     createdAt: Date;
     status: string;
     posts?: PrismaPost[];
+      board?: any;
 }
 
 interface PrismaPost {
