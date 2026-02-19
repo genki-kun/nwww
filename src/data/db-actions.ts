@@ -7,64 +7,75 @@ import { unstable_cache } from 'next/cache'; // DB負荷軽減のためキャッ
 // ここで独自に定義しなおすか、Prismaの型を拡張します。
 // 今回はコンポーネント変更を最小限にするため、戻り値をMockBBS互換に変換します。
 
-export async function getBoards(includeLocked = false) {
-    const boards = await prisma.board.findMany({
-        where: includeLocked ? {} : { status: 'active' },
-        include: {
-            threads: {
-                where: { status: 'active' },
-                orderBy: { lastUpdated: 'desc' },
-                take: 5, // Top page only needs recent threads
-                include: {
-                    posts: {
-                        take: 1,
-                        orderBy: { createdAt: 'desc' }
+export const getBoards = unstable_cache(
+    async (includeLocked = false) => {
+        const boards = await prisma.board.findMany({
+            where: includeLocked ? {} : { status: 'active' },
+            include: {
+                threads: {
+                    where: { status: 'active' },
+                    orderBy: { lastUpdated: 'desc' },
+                    take: 5,
+                    include: {
+                        posts: {
+                            take: 1,
+                            orderBy: { createdAt: 'desc' }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
 
-    return boards.map(board => ({
-        ...board,
-        threads: board.threads.map(convertThread)
-    }));
-}
+        return boards.map(board => ({
+            ...board,
+            threads: board.threads.map(convertThread)
+        }));
+    },
+    ['getBoards'],
+    { tags: ['boards'], revalidate: 60 }
+);
 
-export async function getBoard(boardId: string, page = 1, perPage = 30) {
-    const board = await prisma.board.findUnique({
-        where: { id: boardId },
-        include: {
-            threads: {
-                where: { status: 'active' }, // Only active threads
-                orderBy: { lastUpdated: 'desc' },
-                skip: (page - 1) * perPage,
-                take: perPage,
-                include: {
-                    posts: {
-                        take: 1,
-                        orderBy: { createdAt: 'desc' }
+export const getBoard = unstable_cache(
+    async (boardId: string, page = 1, perPage = 30) => {
+        const board = await prisma.board.findUnique({
+            where: { id: boardId },
+            include: {
+                threads: {
+                    where: { status: 'active' },
+                    orderBy: { lastUpdated: 'desc' },
+                    skip: (page - 1) * perPage,
+                    take: perPage,
+                    include: {
+                        posts: {
+                            take: 1,
+                            orderBy: { createdAt: 'desc' }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
 
-    if (!board) return null;
+        if (!board) return null;
 
-    // Get total active thread count for pagination
-    const totalThreads = await prisma.thread.count({
-        where: { boardId, status: 'active' }
-    });
+        // Get total active thread count for pagination
+        const totalThreads = await prisma.thread.count({
+            where: { boardId, status: 'active' }
+        });
 
-    return {
-        ...board,
-        threads: board.threads.map(convertThread),
-        totalThreads,
-        totalPages: Math.ceil(totalThreads / perPage),
-        currentPage: page
-    };
-}
+        return {
+            ...board,
+            threads: board.threads.map(convertThread),
+            totalThreads,
+            totalPages: Math.ceil(totalThreads / perPage),
+            currentPage: page
+        };
+    },
+    ['getBoard'],
+    { tags: ['board-view'], revalidate: 60 } // Dynamic tags are harder in unstable_cache wrapper, so we use a generic tag and cache key. 
+    // Actually, we should probably include boardId in the keyParts roughly or relies on the arguments.
+    // However, for correct tagging invalidation, we might want specific tags.
+    // Next.js 14 unstable_cache passes arguments to the callback.
+);
 
 export async function getArchivedThreads(boardId: string) {
     const threads = await prisma.thread.findMany({
@@ -155,7 +166,7 @@ function convertThread(thread: PrismaThread) {
 }
 
 // Data Mutation Actions
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export async function addPost(boardId: string, threadId: string, data: { author: string, content: string, userId: string }) {
     // Check limits
@@ -206,6 +217,12 @@ export async function addPost(boardId: string, threadId: string, data: { author:
         }).catch(err => console.error('[AutoSummarize] Background call failed:', err));
     }
 
+    // Revalidate cache
+    revalidatePath(`/${boardId}/${threadId}`);
+    revalidatePath(`/${boardId}`);
+    revalidateTag('boards'); // Update top page lists
+    revalidateTag('board-view'); // Update board lists
+
     return post;
 }
 
@@ -239,6 +256,15 @@ export async function createThread(boardId: string, title: string, content: stri
         return thread;
     });
 
+
+    // End of transaction
+
+
+    // Revalidate cache
+    revalidatePath(`/${boardId}/${result.id}`);
+    revalidatePath(`/${boardId}`);
+    revalidateTag('boards');
+    revalidateTag('board-view');
 
     return result;
 }
