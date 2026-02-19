@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { createNewThread } from '@/app/actions';
 import { Sparkles, X, Type, FileText, CheckCircle2, Loader2, Check } from 'lucide-react';
@@ -138,7 +139,7 @@ export default function NewThreadForm({ boardId, variant = 'default' }: NewThrea
         );
     }
 
-    return (
+    return createPortal(
         <div className={styles.overlay} onClick={handleClose}>
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 {result ? (
@@ -295,7 +296,8 @@ export default function NewThreadForm({ boardId, variant = 'default' }: NewThrea
                     </>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 
