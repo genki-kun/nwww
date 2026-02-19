@@ -32,52 +32,56 @@ export const getBoards = unstable_cache(
     { tags: ['boards'], revalidate: 120 }
 );
 
-// Not wrapped in unstable_cache because we need dynamic tags per boardId.
-// ISR (revalidate = 30 on the page) + on-demand revalidatePath handles caching.
-export async function getBoard(boardId: string, page = 1, perPage = 30) {
-    // Run board+threads query and thread count in parallel
-    const [board, totalThreads] = await Promise.all([
-        prisma.board.findUnique({
-            where: { id: boardId },
-            include: {
-                threads: {
-                    where: { status: 'active' },
-                    orderBy: { lastUpdated: 'desc' },
-                    skip: (page - 1) * perPage,
-                    take: perPage,
-                    select: {
-                        id: true,
-                        title: true,
-                        views: true,
-                        postCount: true,
-                        momentum: true,
-                        status: true,
-                        lastUpdated: true,
-                        createdAt: true,
-                        tags: true,
-                        isAiGenerated: true,
-                        sourceUrl: true,
-                        sourceTitle: true,
-                        sourcePlatform: true,
-                        aiAnalysis: true,
+// Cached per boardId+page with board-specific tag for targeted invalidation
+export function getBoard(boardId: string, page = 1, perPage = 30) {
+    return unstable_cache(
+        async () => {
+            const [board, totalThreads] = await Promise.all([
+                prisma.board.findUnique({
+                    where: { id: boardId },
+                    include: {
+                        threads: {
+                            where: { status: 'active' },
+                            orderBy: { lastUpdated: 'desc' },
+                            skip: (page - 1) * perPage,
+                            take: perPage,
+                            select: {
+                                id: true,
+                                title: true,
+                                views: true,
+                                postCount: true,
+                                momentum: true,
+                                status: true,
+                                lastUpdated: true,
+                                createdAt: true,
+                                tags: true,
+                                isAiGenerated: true,
+                                sourceUrl: true,
+                                sourceTitle: true,
+                                sourcePlatform: true,
+                                aiAnalysis: true,
+                            }
+                        }
                     }
-                }
-            }
-        }),
-        prisma.thread.count({
-            where: { boardId, status: 'active' }
-        })
-    ]);
+                }),
+                prisma.thread.count({
+                    where: { boardId, status: 'active' }
+                })
+            ]);
 
-    if (!board) return null;
+            if (!board) return null;
 
-    return {
-        ...board,
-        threads: board.threads.map(t => convertThread(t)),
-        totalThreads,
-        totalPages: Math.ceil(totalThreads / perPage),
-        currentPage: page
-    };
+            return {
+                ...board,
+                threads: board.threads.map(t => convertThread(t)),
+                totalThreads,
+                totalPages: Math.ceil(totalThreads / perPage),
+                currentPage: page
+            };
+        },
+        ['getBoard', boardId, String(page)],
+        { tags: [`board-${boardId}`], revalidate: 30 }
+    )();
 }
 
 export async function getArchivedThreads(boardId: string) {
@@ -170,6 +174,7 @@ function convertThread(thread: PrismaThread) {
 
 // Data Mutation Actions
 import { revalidatePath } from 'next/cache';
+import { updateTag } from 'next/cache';
 
 export async function addPost(boardId: string, threadId: string, data: { author: string, content: string, userId: string }) {
     // Check limits
@@ -220,10 +225,10 @@ export async function addPost(boardId: string, threadId: string, data: { author:
         }).catch(err => console.error('[AutoSummarize] Background call failed:', err));
     }
 
-    // Revalidate cache — only the affected board and thread, not all boards
+    // Invalidate data caches for the affected board + top page
+    updateTag(`board-${boardId}`);
+    updateTag('all-threads');
     revalidatePath(`/${boardId}/${threadId}`);
-    revalidatePath(`/${boardId}`);
-    revalidatePath('/'); // Top page shows recent threads
 
     return post;
 }
@@ -262,33 +267,37 @@ export async function createThread(boardId: string, title: string, content: stri
     // End of transaction
 
 
-    // Revalidate cache — only the affected board and new thread, not all boards
-    revalidatePath(`/${boardId}/${result.id}`);
+    // Invalidate data caches for the affected board + top page
+    updateTag(`board-${boardId}`);
+    updateTag('all-threads');
     revalidatePath(`/${boardId}`);
-    revalidatePath('/'); // Top page shows recent threads
 
     return result;
 }
 
-export async function getAllThreads(limit = 100) {
-    const threads = await prisma.thread.findMany({
-        orderBy: { lastUpdated: 'desc' },
-        take: limit,
-        include: {
-            board: true,
-            posts: {
-                take: 1,
-                orderBy: { createdAt: 'desc' }
+export const getAllThreads = unstable_cache(
+    async (limit = 100) => {
+        const threads = await prisma.thread.findMany({
+            orderBy: { lastUpdated: 'desc' },
+            take: limit,
+            include: {
+                board: true,
+                posts: {
+                    take: 1,
+                    orderBy: { createdAt: 'desc' }
+                }
             }
-        }
-    });
+        });
 
-    return threads.map(t => ({
-        ...convertThread(t),
-        boardName: t.board.name,
-        boardId: t.board.id
-    }));
-}
+        return threads.map(t => ({
+            ...convertThread(t),
+            boardName: t.board.name,
+            boardId: t.board.id
+        }));
+    },
+    ['getAllThreads'],
+    { tags: ['all-threads'], revalidate: 30 }
+);
 
 
 export async function getAllRecentThreads(limit = 100) {
