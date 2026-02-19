@@ -1,0 +1,195 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0 0 2rem 0;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #333;
+    padding-left: 0.5rem;
+    border-left: 4px solid #000;
+}
+
+[data-theme='dark'] .title {
+    color: #ddd;
+    border-left-color: #fff;
+}
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    background: #fff;
+    border: 1px solid #eee;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+[data-theme='dark'] .card {
+    background: #1a1a1a;
+    border-color: #333;
+}
+
+.card h3 {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.bigNumber {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+    color: #111;
+}
+
+[data-theme='dark'] .bigNumber {
+    color: #fff;
+}
+
+.subtext {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* Charts Row */
+.chartsRow {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .chartsRow {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* CSS Bar Chart */
+.barChart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 200px;
+    gap: 0.5rem;
+    padding-top: 1rem;
+}
+
+.barWrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar {
+    width: 60%;
+    background: #000;
+    min-height: 4px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease;
+    opacity: 0.8;
+}
+
+.bar:hover {
+    opacity: 1;
+}
+
+[data-theme='dark'] .bar {
+    background: #fff;
+}
+
+.barValue {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.barLabel {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #888;
+}
+
+/* Ranking List */
+.rankingList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.rankingItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+[data-theme='dark'] .rankingItem {
+    border-bottom-color: #333;
+}
+
+.rankingItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.rank {
+    font-weight: 700;
+    color: #aaa;
+    width: 24px;
+}
+
+.rankingItem:nth-child(1) .rank {
+    color: #dfae0c;
+}
+
+.rankingItem:nth-child(2) .rank {
+    color: #9c9c9c;
+}
+
+.rankingItem:nth-child(3) .rank {
+    color: #ad7845;
+}
+
+.info {
+    flex: 1;
+    min-width: 0;
+}
+
+.threadTitle {
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 0.1rem;
+}
+
+.meta {
+    font-size: 0.8rem;
+    color: #999;
+}

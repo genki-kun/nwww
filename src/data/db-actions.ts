@@ -399,3 +399,75 @@ export async function updateBoardStatus(boardId: string, status: 'active' | 'loc
 
     return board;
 }
+// Analytics
+export async function getDailyStats() {
+    // 1. Total Counts
+    const totalThreads = await prisma.thread.count();
+    const totalPosts = await prisma.post.count();
+    const totalActiveThreads = await prisma.thread.count({ where: { status: 'active' } });
+
+    // 2. Daily Post Count (Last 7 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
+
+    const postsLast7Days = await prisma.post.groupBy({
+        by: ['createdAt'],
+        where: {
+            createdAt: {
+                gte: sevenDaysAgo
+            }
+        },
+        _count: {
+            id: true
+        }
+    });
+
+    // Group by date string (YYYY-MM-DD)
+    const dailyPostCounts: Record<string, number> = {};
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(sevenDaysAgo);
+        d.setDate(d.getDate() + i);
+        const dateStr = d.toISOString().split('T')[0];
+        dailyPostCounts[dateStr] = 0;
+    }
+
+    postsLast7Days.forEach((p: { createdAt: Date, _count: { id: number } }) => {
+        const dateStr = p.createdAt.toISOString().split('T')[0];
+        if (dailyPostCounts[dateStr] !== undefined) {
+            dailyPostCounts[dateStr] += p._count.id;
+        }
+    });
+
+    const dailyChartData = Object.entries(dailyPostCounts).map(([date, count]) => ({ date, count }));
+
+    // 3. AI Generated Content Ratio
+    const aiThreadsCount = await prisma.thread.count({ where: { isAiGenerated: true } });
+    const aiPostsCount = await prisma.post.count({ where: { isAiGenerated: true } });
+
+    // 4. Momentum Ranking (Top 5 Active Threads)
+    const topThreads = await prisma.thread.findMany({
+        where: { status: 'active' },
+        orderBy: { momentum: 'desc' },
+        take: 5,
+        select: {
+            id: true,
+            title: true,
+            momentum: true,
+            views: true,
+            board: { select: { name: true } }
+        }
+    });
+
+    return {
+        totalThreads,
+        totalPosts,
+        totalActiveThreads,
+        dailyChartData,
+        aiRatio: {
+            threads: aiThreadsCount,
+            posts: aiPostsCount
+        },
+        topMoverThreads: topThreads
+    };
+}
