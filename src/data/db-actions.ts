@@ -35,42 +35,41 @@ export const getBoards = unstable_cache(
 // Not wrapped in unstable_cache because we need dynamic tags per boardId.
 // ISR (revalidate = 30 on the page) + on-demand revalidatePath handles caching.
 export async function getBoard(boardId: string, page = 1, perPage = 30) {
-    const board = await prisma.board.findUnique({
-        where: { id: boardId },
-        include: {
-            threads: {
-                where: { status: 'active' },
-                orderBy: { lastUpdated: 'desc' },
-                skip: (page - 1) * perPage,
-                take: perPage,
-                // Board listing only shows thread metadata (title, views, postCount, etc.)
-                // No need to include posts here
-                select: {
-                    id: true,
-                    title: true,
-                    views: true,
-                    postCount: true,
-                    momentum: true,
-                    status: true,
-                    lastUpdated: true,
-                    createdAt: true,
-                    tags: true,
-                    isAiGenerated: true,
-                    sourceUrl: true,
-                    sourceTitle: true,
-                    sourcePlatform: true,
-                    aiAnalysis: true,
+    // Run board+threads query and thread count in parallel
+    const [board, totalThreads] = await Promise.all([
+        prisma.board.findUnique({
+            where: { id: boardId },
+            include: {
+                threads: {
+                    where: { status: 'active' },
+                    orderBy: { lastUpdated: 'desc' },
+                    skip: (page - 1) * perPage,
+                    take: perPage,
+                    select: {
+                        id: true,
+                        title: true,
+                        views: true,
+                        postCount: true,
+                        momentum: true,
+                        status: true,
+                        lastUpdated: true,
+                        createdAt: true,
+                        tags: true,
+                        isAiGenerated: true,
+                        sourceUrl: true,
+                        sourceTitle: true,
+                        sourcePlatform: true,
+                        aiAnalysis: true,
+                    }
                 }
             }
-        }
-    });
+        }),
+        prisma.thread.count({
+            where: { boardId, status: 'active' }
+        })
+    ]);
 
     if (!board) return null;
-
-    // Get total active thread count for pagination
-    const totalThreads = await prisma.thread.count({
-        where: { boardId, status: 'active' }
-    });
 
     return {
         ...board,

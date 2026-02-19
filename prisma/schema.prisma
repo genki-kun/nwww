@@ -50,6 +50,9 @@ model Thread {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([boardId, status, lastUpdated(sort: Desc)])
+  @@index([status, lastUpdated(sort: Desc)])
 }
 
 model Post {
@@ -72,6 +75,8 @@ model Post {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  @@index([threadId, status, createdAt])
 }
 
 model Report {

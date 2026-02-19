@@ -3,16 +3,20 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import { getBoard } from '@/data/db-actions';
+import { getBoard, getBoards } from '@/data/db-actions';
 import NewThreadForm from '@/components/NewThreadForm';
 import { ArrowLeft, Eye, MessageCircle, Clock, Archive, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './page.module.css';
 import Loading from './loading';
 
 // ISR: Serve cached pages instantly, revalidate in background every 30s.
-// On-demand revalidation via revalidatePath/revalidateTag in actions.ts
-// ensures data freshness when posts/threads are created.
 export const revalidate = 30;
+
+// Pre-generate all board pages at build time
+export async function generateStaticParams() {
+    const boards = await getBoards();
+    return boards.map((board) => ({ boardId: board.id }));
+}
 
 interface PageProps {
     params: Promise<{
