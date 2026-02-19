@@ -2,10 +2,16 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import { getBoard } from '@/data/db-actions';
 import NewThreadForm from '@/components/NewThreadForm';
 import { ArrowLeft, Eye, MessageCircle, Clock, Archive, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './page.module.css';
+import Loading from './loading';
+
+// Force dynamic rendering to ensure UI updates aren't stuck in stale static generation,
+// while relying on unstable_cache for data performance.
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
     params: Promise<{
@@ -32,8 +38,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-import { Suspense } from 'react';
-import Loading from './loading';
+
 
 export default function BoardPageWrapper({ params, searchParams }: PageProps) {
     return (
