@@ -67,7 +67,7 @@ export default function TopSparkCTA({ boards }: TopSparkCTAProps) {
                     router.push(`/${targetBoardId}/${data.threadId}`);
                 }, 1500);
             } else {
-                setError(data.error || '生成に失敗しました');
+                setError(data.details ? `${data.error}: ${data.details}` : data.error || '生成に失敗しました');
                 setIsSubmitting(false);
             }
         } catch (e) {
