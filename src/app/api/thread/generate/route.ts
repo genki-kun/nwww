@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as cheerio from 'cheerio';
 import prisma from '@/lib/prisma';
+import { updateTag } from 'next/cache';
 
 // Helper: Try to scrape content via generic HTTP fetch + OGP metadata
 async function scrapeGeneric(url: string): Promise<{ title: string; content: string }> {
@@ -296,6 +297,10 @@ export async function POST(req: Request) {
 
                 return thread;
             });
+            // Invalidate board and top page caches so the new thread appears
+            updateTag(`board-${targetBoardId}`);
+            updateTag('all-threads');
+
             return NextResponse.json({ success: true, threadId: newThread.id, boardId: targetBoardId });
         } catch (dbError) {
             console.error('Database Transaction Error:', dbError);
