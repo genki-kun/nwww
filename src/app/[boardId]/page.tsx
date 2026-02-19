@@ -9,9 +9,10 @@ import { ArrowLeft, Eye, MessageCircle, Clock, Archive, ChevronLeft, ChevronRigh
 import styles from './page.module.css';
 import Loading from './loading';
 
-// Force dynamic rendering to ensure UI updates aren't stuck in stale static generation,
-// while relying on unstable_cache for data performance.
-export const dynamic = 'force-dynamic';
+// ISR: Serve cached pages instantly, revalidate in background every 30s.
+// On-demand revalidation via revalidatePath/revalidateTag in actions.ts
+// ensures data freshness when posts/threads are created.
+export const revalidate = 30;
 
 interface PageProps {
     params: Promise<{
