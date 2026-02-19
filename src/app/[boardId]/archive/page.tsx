@@ -65,7 +65,7 @@ export default async function ArchivePage({ params }: PageProps) {
                                         <div className={styles.metaData}>
                                             <span className={styles.timestamp}>
                                                 <Clock size={14} />
-                                                {new Date(thread.lastUpdated).toLocaleString('en-US', { hour12: true })}
+                                                {new Date(thread.lastUpdated).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                                             </span>
                                             <div className={styles.stats}>
                                                 <span className={styles.statItem}>

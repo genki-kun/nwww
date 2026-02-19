@@ -98,7 +98,7 @@ export default function ThreadInteractiveView({ boardId, thread, isAdmin }: Thre
                             <div className={styles.postHeader}>
                                 <span className={styles.postIndex}>{index + 1}</span>
                                 <span className={styles.author}>{post.author}</span>
-                                <span className={styles.date} suppressHydrationWarning>{new Date(post.createdAt).toLocaleString()}</span>
+                                <span className={styles.date} suppressHydrationWarning>{new Date(post.createdAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}</span>
                                 <span className={styles.id}>ID: {post.userId || '???'}</span>
 
                                 {/* Admin Menu */}

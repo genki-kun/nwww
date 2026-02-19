@@ -88,7 +88,7 @@ function AnchorLink({ anchorText, targetPost, targetIndex }: { anchorText: strin
                         <span className={styles.previewNumber}>{targetIndex}</span>
                         <span className={styles.previewName}>{targetPost.author}</span>
                         <span className={styles.previewDate}>
-                            {new Date(targetPost.createdAt).toLocaleString('ja-JP')}
+                            {new Date(targetPost.createdAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                         </span>
                     </div>
                     <div className={styles.previewBody}>

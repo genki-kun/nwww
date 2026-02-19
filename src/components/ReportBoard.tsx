@@ -85,7 +85,7 @@ export default function ReportBoard({ initialReports }: ReportBoardProps) {
                     <div key={report.id} className={styles.reportCard}>
                         <div className={styles.reportHeader}>
                             <span className={styles.reasonTag}>{report.reason}</span>
-                            <span className={styles.reportDate}>{new Date(report.createdAt).toLocaleString()}</span>
+                            <span className={styles.reportDate}>{new Date(report.createdAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}</span>
                         </div>
 
                         <div className={styles.postContext}>
@@ -94,7 +94,7 @@ export default function ReportBoard({ initialReports }: ReportBoardProps) {
                             </div>
                             <div className={styles.postBox}>
                                 <div className={styles.postMeta}>
-                                    {report.post.author} - {new Date(report.post.createdAt).toLocaleString()}
+                                    {report.post.author} - {new Date(report.post.createdAt).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                                 </div>
                                 <div className={styles.postContent}>
                                     {report.post.content}

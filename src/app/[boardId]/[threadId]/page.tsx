@@ -83,7 +83,7 @@ export default async function ThreadPage({ params }: PageProps) {
                 <h1 className={styles.title}>{thread.title}</h1>
                 <div className={styles.meta}>
                     <span>Res: {thread.postCount}</span>
-                    <span>Updated: {new Date(thread.lastUpdated).toLocaleString()}</span>
+                    <span>Updated: {new Date(thread.lastUpdated).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}</span>
                 </div>
             </header>
 
