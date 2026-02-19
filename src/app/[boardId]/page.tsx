@@ -32,7 +32,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-export default async function BoardPage({ params, searchParams }: PageProps) {
+import { Suspense } from 'react';
+import Loading from './loading';
+
+export default function BoardPageWrapper({ params, searchParams }: PageProps) {
+    return (
+        <Suspense fallback={<Loading />}>
+            <BoardContent params={params} searchParams={searchParams} />
+        </Suspense>
+    );
+}
+
+async function BoardContent({ params, searchParams }: PageProps) {
     const paramsPromise = params;
     const searchParamsPromise = searchParams;
 
@@ -40,6 +51,8 @@ export default async function BoardPage({ params, searchParams }: PageProps) {
     const { page: pageStr } = await searchParamsPromise;
 
     const page = Math.max(1, parseInt(pageStr || '1', 10));
+    // Use smaller sleep to simulate network if needed for testing, but remove for prod
+
     const board = await getBoard(boardId, page);
 
     if (!board) {
@@ -60,7 +73,6 @@ export default async function BoardPage({ params, searchParams }: PageProps) {
                             <p className={styles.boardDesc}>{board.description}</p>
                         </div>
                     </div>
-
                 </div>
             </header>
 
