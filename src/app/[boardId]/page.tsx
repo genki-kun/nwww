@@ -100,14 +100,19 @@ async function BoardContent({ params, searchParams }: PageProps) {
                 <div className={styles.threadList}>
                     {board.threads.length === 0 ? (
                         <div className={styles.emptyState}>
-                            <div className={styles.emptyIcon}>
-                                <MessageCircle size={64} strokeWidth={1} />
+                            <div className={styles.emptyContent}>
+                                <div className={styles.emptyIconWrapper}>
+                                    <MessageCircle size={48} strokeWidth={1.5} />
+                                </div>
+                                <h3 className={styles.emptyTitle}>まだスレッドがないよ</h3>
+                                <p className={styles.emptyDescription}>
+                                    スレ立てしてね。<br />
+                                    気になる記事やXの投稿のURLからも自動で作れるよ。
+                                </p>
+                                <div className={styles.emptyAction}>
+                                    <NewThreadForm boardId={boardId} variant="primary" />
+                                </div>
                             </div>
-                            <p className={styles.emptyText}>
-                                まだスレッドがありません。<br />
-                                最初のスレッドを作成してみませんか？
-                            </p>
-                            <NewThreadForm boardId={boardId} variant="primary" />
                         </div>
                     ) : (
                         board.threads.map((thread) => (
