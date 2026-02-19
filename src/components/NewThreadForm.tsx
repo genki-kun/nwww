@@ -32,12 +32,13 @@ export default function NewThreadForm({ boardId, variant = 'default' }: NewThrea
         setIsSubmitting(true);
         setError(null);
 
+        const honeypot = (e.currentTarget as HTMLFormElement).elements.namedItem('website_url_verification') as HTMLInputElement;
         try {
             const res = await fetch('/api/thread/generate', {
                 method: 'POST',
                 body: JSON.stringify({
                     url: aiUrl,
-                    website_url_verification: (e.currentTarget as HTMLFormElement).elements.namedItem('website_url_verification')?.valueOf()
+                    website_url_verification: honeypot?.value || ''
                 }),
                 headers: { 'Content-Type': 'application/json' }
             });

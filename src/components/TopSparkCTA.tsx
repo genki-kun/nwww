@@ -54,7 +54,7 @@ export default function TopSparkCTA({ boards }: TopSparkCTAProps) {
                 method: 'POST',
                 body: JSON.stringify({
                     url,
-                    website_url_verification: (e.currentTarget as HTMLFormElement).elements.namedItem('website_url_verification')?.valueOf()
+                    website_url_verification: honeypot?.value || ''
                 }),
                 headers: { 'Content-Type': 'application/json' }
             });
