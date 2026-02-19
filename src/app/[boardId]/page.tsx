@@ -2,21 +2,13 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
-import { getBoard, getBoards } from '@/data/db-actions';
+import { getBoard } from '@/data/db-actions';
 import NewThreadForm from '@/components/NewThreadForm';
 import { ArrowLeft, Eye, MessageCircle, Clock, Archive, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './page.module.css';
-import Loading from './loading';
 
 // ISR: Serve cached pages instantly, revalidate in background every 30s.
 export const revalidate = 30;
-
-// Pre-generate all board pages at build time
-export async function generateStaticParams() {
-    const boards = await getBoards();
-    return boards.map((board) => ({ boardId: board.id }));
-}
 
 interface PageProps {
     params: Promise<{
@@ -43,25 +35,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
 }
 
-
-
-export default function BoardPageWrapper({ params, searchParams }: PageProps) {
-    return (
-        <Suspense fallback={<Loading />}>
-            <BoardContent params={params} searchParams={searchParams} />
-        </Suspense>
-    );
-}
-
-async function BoardContent({ params, searchParams }: PageProps) {
-    const paramsPromise = params;
-    const searchParamsPromise = searchParams;
-
-    const { boardId } = await paramsPromise;
-    const { page: pageStr } = await searchParamsPromise;
-
+export default async function BoardPage({ params, searchParams }: PageProps) {
+    const { boardId } = await params;
+    const { page: pageStr } = await searchParams;
     const page = Math.max(1, parseInt(pageStr || '1', 10));
-    // Use smaller sleep to simulate network if needed for testing, but remove for prod
 
     const board = await getBoard(boardId, page);
 
