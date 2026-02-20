@@ -27,11 +27,11 @@ export const metadata: Metadata = {
     template: '%s | NWWW ｜ ニュ〜',
     default: 'NWWW ｜ ニュ〜',
   },
-  description: "もっと話したいことをここで、みんなの新しい掲示板",
+  description: "もっと話したいことをここで、新しいみんなの匿名掲示板",
   metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
   openGraph: {
     title: 'NWWW ｜ ニュ〜',
-    description: "もっと話したいことをここで、みんなの新しい掲示板",
+    description: "もっと話したいことをここで、新しいみんなの匿名掲示板",
     siteName: 'NWWW',
     locale: 'ja_JP',
     type: 'website',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'NWWW ｜ ニュ〜',
-    description: "もっと話したいことをここで、みんなの新しい掲示板",
+    description: "もっと話したいことをここで、新しいみんなの匿名掲示板",
     images: ['/ogp.png'],
   },
 };
