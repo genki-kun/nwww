@@ -28,7 +28,7 @@ export const getBoards = unstable_cache(
             threads: [] // Sidebar doesn't render threads
         }));
     },
-    ['getBoards'],
+    ['getBoards', 'v2'],
     { tags: ['boards'], revalidate: 120 }
 );
 
@@ -79,7 +79,7 @@ export function getBoard(boardId: string, page = 1, perPage = 30) {
                 currentPage: page
             };
         },
-        ['getBoard', boardId, String(page)],
+        ['getBoard', 'v2', boardId, String(page)],
         { tags: [`board-${boardId}`], revalidate: 30 }
     )();
 }
@@ -296,7 +296,7 @@ export const getAllThreads = unstable_cache(
             boardId: t.board.id
         }));
     },
-    ['getAllThreads'],
+    ['getAllThreads', 'v2'],
     { tags: ['all-threads'], revalidate: 30 }
 );
 
