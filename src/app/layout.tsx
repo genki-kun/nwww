@@ -11,6 +11,7 @@ import SparkAdmin from '@/components/SparkAdmin';
 import ThemeToggle from '@/components/ThemeToggle';
 import MobileHeader from '@/components/MobileHeader';
 import Providers from '@/components/Providers';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 import "./globals.css";
 import styles from './layout.module.css';
 
@@ -63,6 +64,7 @@ export default async function RootLayout({
     <html lang="ja" className={notoSansJP.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <GoogleAnalytics />
       </head>
       <body>
         <MobileHeader boards={boards} />

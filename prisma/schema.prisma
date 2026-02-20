@@ -30,7 +30,7 @@ model Thread {
   views         Int      @default(0)
   postCount     Int      @default(0) // Denormalized count for performance
   momentum      Int      @default(0)
-  status        String   @default("active") // 'active' | 'archived'
+  status        String   @default("active") // 'active' | 'archived' | 'filled' | 'hidden'
   lastUpdated   DateTime @default(now())
 
   // AI Generation & Source Tracking

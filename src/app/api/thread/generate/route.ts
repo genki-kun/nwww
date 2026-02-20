@@ -74,15 +74,21 @@ export async function POST(req: Request) {
     try {
         const { url, website_url_verification } = await req.json();
 
-        // Rate Limit Check (IP-based)
-        const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
-        const canGenerate = await checkRateLimit(`thread-gen:${ip}`, 1, 60000); // 1 request per minute
-        if (!canGenerate) {
-            return NextResponse.json({ error: 'Too many requests. Please wait a minute.' }, { status: 429 });
-        }
+        // Internal cron calls bypass rate limiting and honeypot
+        const cronSecret = req.headers.get('x-cron-secret');
+        const isCronCall = cronSecret && cronSecret === process.env.CRON_SECRET;
 
-        if (website_url_verification) {
-            return NextResponse.json({ error: 'Spam detected' }, { status: 400 });
+        if (!isCronCall) {
+            // Rate Limit Check (IP-based)
+            const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
+            const canGenerate = await checkRateLimit(`thread-gen:${ip}`, 1, 60000); // 1 request per minute
+            if (!canGenerate) {
+                return NextResponse.json({ error: 'Too many requests. Please wait a minute.' }, { status: 429 });
+            }
+
+            if (website_url_verification) {
+                return NextResponse.json({ error: 'Spam detected' }, { status: 400 });
+            }
         }
 
         if (!url) {

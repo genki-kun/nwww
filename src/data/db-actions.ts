@@ -278,6 +278,7 @@ export async function createThread(boardId: string, title: string, content: stri
 export const getAllThreads = unstable_cache(
     async (limit = 100) => {
         const threads = await prisma.thread.findMany({
+            where: { status: 'active' },
             orderBy: { lastUpdated: 'desc' },
             take: limit,
             include: {
@@ -302,14 +303,11 @@ export const getAllThreads = unstable_cache(
 
 export async function getAllRecentThreads(limit = 100) {
     const threads = await prisma.thread.findMany({
+        where: { status: 'active' },
         orderBy: { lastUpdated: 'desc' },
         take: limit,
         include: {
             board: true
-            // posts not needed for list view, but convertThread expects it?
-            // convertThread handles missing posts gracefully if posts is optional in type, 
-            // but in my implementation it maps over posts. 
-            // let's include posts for safety or update convertThread
         }
     });
 
@@ -330,6 +328,7 @@ export async function searchThreads(query: string, boardId?: string) {
     if (!query.trim()) return [];
 
     const where: Record<string, any> = {
+        status: 'active',
         OR: [
             { title: { contains: query, mode: 'insensitive' } },
             { posts: { some: { content: { contains: query, mode: 'insensitive' } } } }
