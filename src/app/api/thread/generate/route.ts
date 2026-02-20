@@ -69,6 +69,117 @@ async function scrapeTwitter(url: string): Promise<{ title: string; content: str
 }
 
 import { checkRateLimit } from '@/lib/rate-limit';
+import crypto from 'crypto';
+
+// AI自動レス生成（fire-and-forget）
+async function generateAiReplies(
+    genAI: GoogleGenerativeAI,
+    modelsToTry: string[],
+    threadId: string,
+    boardId: string,
+    threadTitle: string,
+    initialPostContent: string
+) {
+    const replyPrompt = `
+あなたは匿名掲示板「NWWW」の住人です。以下のスレッドの>>1を読んで、
+2〜3人の別々の名無しとして自然なレスを書いてください。
+
+## スレッド情報
+タイトル: ${threadTitle}
+>>1: ${initialPostContent}
+
+## レスの指示
+- 各レスは別人として書く（口調や視点を変える）
+- ツッコミ、同意、煽り、補足情報、体験談、豆知識など多様に
+- アンカー（>>1 や >>2 など）を自然に使ってよい（使わなくてもよい）
+- 1レスは短め（1〜3行程度）
+- 報道口調・丁寧語は禁止。断定調、ため口で
+- 「w」「草」「それな」「〜だろ」「〜じゃね」などネットスラングを自然に
+- 絵文字は使わない
+
+## 出力（JSON配列のみ、他のテキスト不要）
+[
+  { "content": "レス内容" },
+  { "content": "レス内容" },
+  { "content": "レス内容" }
+]
+`;
+
+    let replyText = '';
+    for (const modelName of modelsToTry) {
+        try {
+            const model = genAI.getGenerativeModel({ model: modelName });
+            const result = await model.generateContent(replyPrompt);
+            replyText = result.response.text();
+            if (replyText) break;
+        } catch (e: unknown) {
+            console.warn(`[AIReply] Model ${modelName} failed:`, e);
+            continue;
+        }
+    }
+
+    if (!replyText) {
+        console.error('[AIReply] All models failed');
+        return;
+    }
+
+    const jsonMatch = replyText.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+        console.error('[AIReply] No JSON array found:', replyText);
+        return;
+    }
+
+    let replies: { content: string }[];
+    try {
+        replies = JSON.parse(jsonMatch[0]);
+    } catch {
+        console.error('[AIReply] JSON parse failed:', jsonMatch[0]);
+        return;
+    }
+
+    // 各レスを時間をずらして投稿（createdAtを直接指定）
+    const now = Date.now();
+    for (let i = 0; i < replies.length && i < 3; i++) {
+        const reply = replies[i];
+        if (!reply.content) continue;
+
+        // レスごとに異なるuserIdを生成（別人に見せる）
+        const randomId = crypto.randomBytes(5).toString('hex').substring(0, 9);
+
+        // createdAtをずらす: 3〜5分, 5〜9分, 7〜12分
+        const minDelay = (3 + i * 2) * 60 * 1000;
+        const maxDelay = (5 + i * 3) * 60 * 1000;
+        const delay = minDelay + Math.random() * (maxDelay - minDelay);
+        const createdAt = new Date(now + delay);
+
+        await prisma.post.create({
+            data: {
+                content: reply.content,
+                author: '名無しさん',
+                userId: `AI_${randomId}`,
+                threadId,
+                isAiGenerated: true,
+                createdAt,
+            }
+        });
+
+        await prisma.thread.update({
+            where: { id: threadId },
+            data: {
+                postCount: { increment: 1 },
+                momentum: { increment: 10 },
+                lastUpdated: createdAt,
+            }
+        });
+
+        console.log(`[AIReply] Posted reply ${i + 1} for thread ${threadId} (createdAt: ${createdAt.toISOString()})`);
+    }
+
+    // キャッシュ更新
+    revalidateTag(`board-${boardId}`, { expire: 0 });
+    revalidateTag('all-threads', { expire: 0 });
+    console.log(`[AIReply] Done: ${Math.min(replies.length, 3)} replies for thread ${threadId}`);
+}
 
 export async function POST(req: Request) {
     try {
@@ -305,6 +416,10 @@ export async function POST(req: Request) {
             // Invalidate board and top page caches so the new thread appears
             revalidateTag(`board-${targetBoardId}`, { expire: 0 });
             revalidateTag('all-threads', { expire: 0 });
+
+            // Fire-and-forget: Generate AI replies to make the thread feel alive
+            generateAiReplies(genAI, modelsToTry, newThread.id, targetBoardId, data.title, data.initialPostContent)
+                .catch(err => console.error('[AIReply] Failed:', err));
 
             return NextResponse.json({ success: true, threadId: newThread.id, boardId: targetBoardId });
         } catch (dbError) {
