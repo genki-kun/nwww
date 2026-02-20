@@ -1,5 +1,4 @@
 
-import React from 'react';
 import Link from 'next/link';
 import styles from '../LegalLayout.module.css';
 
@@ -19,9 +18,9 @@ export default function PrivacyPage() {
                 <span className={styles.sectionTitle}>1. 収集する情報</span>
                 <p className={styles.content}>
                     本サービスは、以下の情報を収集・取得することがあります。{"\n"}
-                    1. **アクセスログ**: IPアドレス、ブラウザの種類、アクセス日時。{"\n"}
-                    2. **投稿情報**: ユーザーが本サービス上に投稿した内容。{"\n"}
-                    3. **Cookieおよびローカルストレージ**: 閲覧履歴の記録（Discover機能等に使用）やテーマ設定の保存に使用します。
+                    1. <strong>アクセスログ</strong>: IPアドレス、ブラウザの種類、アクセス日時。{"\n"}
+                    2. <strong>投稿情報</strong>: ユーザーが本サービス上に投稿した内容。{"\n"}
+                    3. <strong>Cookieおよびローカルストレージ</strong>: 閲覧履歴の記録（Discover機能等に使用）やテーマ設定の保存に使用します。
                 </p>
             </div>
 
@@ -29,18 +28,18 @@ export default function PrivacyPage() {
                 <span className={styles.sectionTitle}>2. 利用目的</span>
                 <p className={styles.content}>
                     収集した情報は、以下の目的で利用します。{"\n"}
-                    1. **サービスの提供と運営**: 投稿の表示、AIによる要約や板選定の実行。{"\n"}
-                    2. **モデレーション**: スパム対策、荒らし行為の制限。{"\n"}
-                    3. **ユーザー体験の向上**: 閲覧履歴に基づいたスレッドのレコメンド。{"\n"}
-                    4. **安全の確保**: 規約違反の調査、法的要請への対応。
+                    1. <strong>サービスの提供と運営</strong>: 投稿の表示、AIによる要約や板選定の実行。{"\n"}
+                    2. <strong>モデレーション</strong>: スパム対策、荒らし行為の制限。{"\n"}
+                    3. <strong>ユーザー体験の向上</strong>: 閲覧履歴に基づいたスレッドのレコメンド。{"\n"}
+                    4. <strong>安全の確保</strong>: 規約違反の調査、法的要請への対応。
                 </p>
             </div>
 
             <div className={styles.section}>
                 <span className={styles.sectionTitle}>3. 情報の保管と保護</span>
                 <p className={styles.content}>
-                    1. **IPアドレスの取り扱い**: 投稿時のIPアドレスはハッシュ化等の処理を行い、投稿者の識別に利用します。生のアドレスは管理目的以外で公開されることはありません。{"\n"}
-                    2. **セキュリティ**: 本サービスは、収集した情報の漏洩、紛失、不正アクセスを防止するために、適切な技術的対策を講じます。
+                    1. <strong>IPアドレスの取り扱い</strong>: 投稿時のIPアドレスはハッシュ化等の処理を行い、投稿者の識別に利用します。生のアドレスは管理目的以外で公開されることはありません。{"\n"}
+                    2. <strong>セキュリティ</strong>: 本サービスは、収集した情報の漏洩、紛失、不正アクセスを防止するために、適切な技術的対策を講じます。
                 </p>
             </div>
 
@@ -71,7 +70,8 @@ export default function PrivacyPage() {
             <div className={styles.section}>
                 <span className={styles.sectionTitle}>7. お問い合わせ</span>
                 <p className={styles.content}>
-                    情報の取り扱いに関するご質問等は、本サービスのお問い合わせ窓口（準備中）までご連絡ください。
+                    情報の取り扱いに関するご質問等は、以下の窓口までご連絡ください。{"\n"}
+                    メール: <a href="mailto:info@nwww.jp">info@nwww.jp</a>
                 </p>
             </div>
 
