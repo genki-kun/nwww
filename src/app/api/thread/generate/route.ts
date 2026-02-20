@@ -155,7 +155,7 @@ async function generateAiReplies(
         await prisma.post.create({
             data: {
                 content: reply.content,
-                author: '名無しさん',
+                author: '名無しさん@ニュ〜',
                 userId: `AI_${randomId}`,
                 threadId,
                 isAiGenerated: true,
