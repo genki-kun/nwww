@@ -1,15 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as cheerio from 'cheerio';
 import prisma from '@/lib/prisma';
 import { revalidateTag } from 'next/cache';
+import { generateAiReplies } from '@/lib/ai-replies';
 
 // Helper: Try to scrape content via generic HTTP fetch + OGP metadata
 async function scrapeGeneric(url: string): Promise<{ title: string; content: string }> {
     const res = await fetch(url, {
         headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
+        },
+        signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
     const html = await res.text();
@@ -41,7 +43,7 @@ async function scrapeGeneric(url: string): Promise<{ title: string; content: str
 async function scrapeTwitter(url: string): Promise<{ title: string; content: string } | null> {
     try {
         const oembedUrl = `https://publish.twitter.com/oembed?url=${encodeURIComponent(url)}`;
-        const res = await fetch(oembedUrl);
+        const res = await fetch(oembedUrl, { signal: AbortSignal.timeout(5000) });
 
         if (!res.ok) {
             console.warn(`Twitter oEmbed returned ${res.status}, falling back to generic scraping`);
@@ -69,117 +71,6 @@ async function scrapeTwitter(url: string): Promise<{ title: string; content: str
 }
 
 import { checkRateLimit } from '@/lib/rate-limit';
-import crypto from 'crypto';
-
-// AI自動レス生成（fire-and-forget）
-async function generateAiReplies(
-    genAI: GoogleGenerativeAI,
-    modelsToTry: string[],
-    threadId: string,
-    boardId: string,
-    threadTitle: string,
-    initialPostContent: string
-) {
-    const replyPrompt = `
-あなたは匿名掲示板「NWWW」の住人です。以下のスレッドの>>1を読んで、
-2〜3人の別々の名無しとして自然なレスを書いてください。
-
-## スレッド情報
-タイトル: ${threadTitle}
->>1: ${initialPostContent}
-
-## レスの指示
-- 各レスは別人として書く（口調や視点を変える）
-- ツッコミ、同意、煽り、補足情報、体験談、豆知識など多様に
-- アンカー（>>1 や >>2 など）を自然に使ってよい（使わなくてもよい）
-- 1レスは短め（1〜3行程度）
-- 報道口調・丁寧語は禁止。断定調、ため口で
-- 「w」「草」「それな」「〜だろ」「〜じゃね」などネットスラングを自然に
-- 絵文字は使わない
-
-## 出力（JSON配列のみ、他のテキスト不要）
-[
-  { "content": "レス内容" },
-  { "content": "レス内容" },
-  { "content": "レス内容" }
-]
-`;
-
-    let replyText = '';
-    for (const modelName of modelsToTry) {
-        try {
-            const model = genAI.getGenerativeModel({ model: modelName });
-            const result = await model.generateContent(replyPrompt);
-            replyText = result.response.text();
-            if (replyText) break;
-        } catch (e: unknown) {
-            console.warn(`[AIReply] Model ${modelName} failed:`, e);
-            continue;
-        }
-    }
-
-    if (!replyText) {
-        console.error('[AIReply] All models failed');
-        return;
-    }
-
-    const jsonMatch = replyText.match(/\[[\s\S]*\]/);
-    if (!jsonMatch) {
-        console.error('[AIReply] No JSON array found:', replyText);
-        return;
-    }
-
-    let replies: { content: string }[];
-    try {
-        replies = JSON.parse(jsonMatch[0]);
-    } catch {
-        console.error('[AIReply] JSON parse failed:', jsonMatch[0]);
-        return;
-    }
-
-    // 各レスを時間をずらして投稿（createdAtを直接指定）
-    const now = Date.now();
-    for (let i = 0; i < replies.length && i < 3; i++) {
-        const reply = replies[i];
-        if (!reply.content) continue;
-
-        // レスごとに異なるuserIdを生成（別人に見せる）
-        const randomId = crypto.randomBytes(5).toString('hex').substring(0, 9);
-
-        // createdAtをずらす: 3〜5分, 5〜9分, 7〜12分
-        const minDelay = (3 + i * 2) * 60 * 1000;
-        const maxDelay = (5 + i * 3) * 60 * 1000;
-        const delay = minDelay + Math.random() * (maxDelay - minDelay);
-        const createdAt = new Date(now + delay);
-
-        await prisma.post.create({
-            data: {
-                content: reply.content,
-                author: '名無しさん@ニュ〜',
-                userId: `AI_${randomId}`,
-                threadId,
-                isAiGenerated: true,
-                createdAt,
-            }
-        });
-
-        await prisma.thread.update({
-            where: { id: threadId },
-            data: {
-                postCount: { increment: 1 },
-                momentum: { increment: 10 },
-                lastUpdated: createdAt,
-            }
-        });
-
-        console.log(`[AIReply] Posted reply ${i + 1} for thread ${threadId} (createdAt: ${createdAt.toISOString()})`);
-    }
-
-    // キャッシュ更新
-    revalidateTag(`board-${boardId}`, { expire: 0 });
-    revalidateTag('all-threads', { expire: 0 });
-    console.log(`[AIReply] Done: ${Math.min(replies.length, 3)} replies for thread ${threadId}`);
-}
 
 export async function POST(req: Request) {
     try {
@@ -202,8 +93,30 @@ export async function POST(req: Request) {
             }
         }
 
-        if (!url) {
+        if (!url || typeof url !== 'string') {
             return NextResponse.json({ error: 'URL is required' }, { status: 400 });
+        }
+
+        // Validate URL scheme (only http/https allowed)
+        try {
+            const parsed = new URL(url);
+            if (!['http:', 'https:'].includes(parsed.protocol)) {
+                return NextResponse.json({ error: 'Invalid URL scheme. Only http and https are allowed.' }, { status: 400 });
+            }
+            // Block localhost/private/cloud metadata IPs (SSRF protection)
+            const hostname = parsed.hostname.toLowerCase();
+            const blockedPatterns = [
+                'localhost', '127.0.0.1', '0.0.0.0', '[::1]',
+                '169.254.',  // AWS/cloud metadata service
+            ];
+            const blockedPrefixes = ['192.168.', '10.', '172.16.', '172.17.', '172.18.', '172.19.',
+                '172.20.', '172.21.', '172.22.', '172.23.', '172.24.', '172.25.', '172.26.',
+                '172.27.', '172.28.', '172.29.', '172.30.', '172.31.', '169.254.'];
+            if (blockedPatterns.includes(hostname) || blockedPrefixes.some(p => hostname.startsWith(p))) {
+                return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
+            }
+        } catch {
+            return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
         }
 
         if (!process.env.GEMINI_API_KEY) {
@@ -422,9 +335,14 @@ export async function POST(req: Request) {
             revalidateTag(`board-${targetBoardId}`, { expire: 0 });
             revalidateTag('all-threads', { expire: 0 });
 
-            // Fire-and-forget: Generate AI replies to make the thread feel alive
-            generateAiReplies(genAI, modelsToTry, newThread.id, targetBoardId, data.title, data.initialPostContent)
-                .catch(err => console.error('[AIReply] Failed:', err));
+            // after() ensures AI reply generation survives after response is sent
+            after(async () => {
+                try {
+                    await generateAiReplies(newThread.id, targetBoardId, data.title, data.initialPostContent);
+                } catch (err) {
+                    console.error('[AIReply] Failed:', err);
+                }
+            });
 
             return NextResponse.json({ success: true, threadId: newThread.id, boardId: targetBoardId });
         } catch (dbError) {
@@ -434,9 +352,8 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error('API Implementation Error:', error);
-        // Return the specific error message to client for debugging
         return NextResponse.json(
-            { error: 'Internal Server Error', details: error.message || String(error) },
+            { error: 'スレッドの生成に失敗しました。しばらくしてから再度お試しください。' },
             { status: 500 }
         );
     }

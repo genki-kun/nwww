@@ -80,7 +80,7 @@ export function getBoard(boardId: string, page = 1, perPage = 30) {
             };
         },
         ['getBoard', 'v2', boardId, String(page)],
-        { tags: [`board-${boardId}`], revalidate: 30 }
+        { tags: [`board-${boardId}`], revalidate: 120 }
     )();
 }
 
@@ -175,41 +175,46 @@ function convertThread(thread: PrismaThread) {
 // Data Mutation Actions
 import { revalidatePath } from 'next/cache';
 import { updateTag } from 'next/cache';
+import { after } from 'next/server';
+import { generateAiReplies, maybeReplyToHumanPost } from '@/lib/ai-replies';
 
 export async function addPost(boardId: string, threadId: string, data: { author: string, content: string, userId: string }) {
-    // Check limits
-    const thread = await prisma.thread.findUnique({
-        where: { id: threadId },
-        select: { postCount: true, status: true }
-    });
+    // Wrap in transaction for data integrity
+    const { post, updatedThread } = await prisma.$transaction(async (tx) => {
+        // Check limits
+        const thread = await tx.thread.findUnique({
+            where: { id: threadId },
+            select: { postCount: true, status: true }
+        });
 
-    if (!thread) throw new Error('Thread not found');
-    if (thread.postCount >= 1000 || thread.status === 'filled') {
-        throw new Error('Thread has reached 1000 posts');
-    }
-
-    const post = await prisma.post.create({
-        data: {
-            content: data.content,
-            author: data.author, // トリップなどの処理はここで
-            userId: data.userId,
-            threadId: threadId,
-            // No boardId in Post model
+        if (!thread) throw new Error('Thread not found');
+        if (thread.postCount >= 1000 || thread.status === 'filled') {
+            throw new Error('Thread has reached 1000 posts');
         }
-    });
 
-    // Threadの統計情報を更新
-    const newPostCount = thread.postCount + 1;
-    const newStatus = newPostCount >= 1000 ? 'filled' : 'active';
+        const post = await tx.post.create({
+            data: {
+                content: data.content,
+                author: data.author,
+                userId: data.userId,
+                threadId: threadId,
+            }
+        });
 
-    const updatedThread = await prisma.thread.update({
-        where: { id: threadId },
-        data: {
-            lastUpdated: new Date(),
-            postCount: { increment: 1 },
-            momentum: { increment: 10 }, // 勢い計算（簡易）
-            status: newStatus
-        }
+        const newPostCount = thread.postCount + 1;
+        const newStatus = newPostCount >= 1000 ? 'filled' : 'active';
+
+        const updatedThread = await tx.thread.update({
+            where: { id: threadId },
+            data: {
+                lastUpdated: new Date(),
+                postCount: { increment: 1 },
+                momentum: { increment: 10 },
+                status: newStatus
+            }
+        });
+
+        return { post, updatedThread };
     });
 
     // Auto-trigger AI summarization at milestones (fire-and-forget)
@@ -220,7 +225,10 @@ export async function addPost(boardId: string, threadId: string, data: { author:
         const baseUrl = process.env.NEXTAUTH_URL || process.env.VERCEL_URL || 'http://localhost:3000';
         fetch(`${baseUrl}/api/thread/summarize`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'x-cron-secret': process.env.CRON_SECRET || '',
+            },
             body: JSON.stringify({ threadId }),
         }).catch(err => console.error('[AutoSummarize] Background call failed:', err));
     }
@@ -229,6 +237,16 @@ export async function addPost(boardId: string, threadId: string, data: { author:
     updateTag(`board-${boardId}`);
     updateTag('all-threads');
     revalidatePath(`/${boardId}/${threadId}`);
+
+    // after() ensures this runs after the response is sent (survives serverless shutdown)
+    const isAiPost = data.userId.startsWith('AI_');
+    after(async () => {
+        try {
+            await maybeReplyToHumanPost(threadId, boardId, isAiPost);
+        } catch (err) {
+            console.error('[AIReply] Conversation reply failed:', err);
+        }
+    });
 
     return post;
 }
@@ -254,7 +272,7 @@ export async function createThread(boardId: string, title: string, content: stri
         await tx.post.create({
             data: {
                 content: content,
-                author: '名無しさん', // Default
+                author: '名無しさん@ニュ〜', // Default
                 userId: userId,
                 threadId: thread.id,
             }
@@ -271,6 +289,15 @@ export async function createThread(boardId: string, title: string, content: stri
     updateTag(`board-${boardId}`);
     updateTag('all-threads');
     revalidatePath(`/${boardId}`);
+
+    // after() ensures this runs after the response is sent (survives serverless shutdown)
+    after(async () => {
+        try {
+            await generateAiReplies(result.id, boardId, title, content);
+        } catch (err) {
+            console.error('[AIReply] Failed for manual thread:', err);
+        }
+    });
 
     return result;
 }
@@ -297,7 +324,7 @@ export const getAllThreads = unstable_cache(
         }));
     },
     ['getAllThreads', 'v2'],
-    { tags: ['all-threads'], revalidate: 30 }
+    { tags: ['all-threads'], revalidate: 120 }
 );
 
 

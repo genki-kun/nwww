@@ -4,7 +4,19 @@ import prisma from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
-        const { threadId } = await req.json();
+        // Internal-only: require cron secret (origin/referer headers are spoofable)
+        const cronSecret = req.headers.get('x-cron-secret');
+        if (!cronSecret || cronSecret !== process.env.CRON_SECRET) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+        }
+
+        let body: any;
+        try {
+            body = await req.json();
+        } catch {
+            return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+        }
+        const { threadId } = body;
 
         if (!threadId) {
             return NextResponse.json({ error: 'threadId is required' }, { status: 400 });

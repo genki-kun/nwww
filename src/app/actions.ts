@@ -9,6 +9,13 @@ import { authOptions } from "@/lib/auth";
 
 import { checkRateLimit } from '@/lib/rate-limit';
 
+async function requireAdmin() {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) return false;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    return adminEmail ? session.user.email === adminEmail : false;
+}
+
 function generateDailyId(ip: string): string {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     const salt = "NWWW_SECRET_SALT_V1"; // In real app, env var
@@ -129,8 +136,7 @@ export async function reportPost(formData: FormData) {
 }
 
 export async function deletePostAction(formData: FormData) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    if (!await requireAdmin()) {
         return { success: false, message: 'Unauthorized' };
     }
 
@@ -144,8 +150,7 @@ export async function deletePostAction(formData: FormData) {
 }
 
 export async function restorePostAction(formData: FormData) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    if (!await requireAdmin()) {
         return { success: false, message: 'Unauthorized' };
     }
 
@@ -159,8 +164,7 @@ export async function restorePostAction(formData: FormData) {
 }
 
 export async function deleteThreadAction(formData: FormData) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    if (!await requireAdmin()) {
         return { success: false, message: 'Unauthorized' };
     }
 
@@ -173,8 +177,7 @@ export async function deleteThreadAction(formData: FormData) {
 }
 
 export async function updateReportStatus(formData: FormData) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    if (!await requireAdmin()) {
         return { success: false, message: 'Unauthorized' };
     }
 
@@ -189,8 +192,7 @@ export async function updateReportStatus(formData: FormData) {
 }
 
 export async function toggleBoardStatusAction(formData: FormData) {
-    const session = await getServerSession(authOptions);
-    if (!session) {
+    if (!await requireAdmin()) {
         return { success: false, message: 'Unauthorized' };
     }
 

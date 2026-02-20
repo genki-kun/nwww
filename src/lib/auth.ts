@@ -10,7 +10,11 @@ export const authOptions: NextAuthOptions = {
     ],
     callbacks: {
         async signIn({ user }) {
-            const adminEmail = process.env.ADMIN_EMAIL || "genkikun0513@gmail.com";
+            const adminEmail = process.env.ADMIN_EMAIL;
+            if (!adminEmail) {
+                console.error('ADMIN_EMAIL environment variable is not set');
+                return false;
+            }
             if (user.email === adminEmail) {
                 return true;
             }

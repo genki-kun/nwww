@@ -4,7 +4,13 @@ import crypto from 'crypto';
 
 export async function POST(req: Request) {
     try {
-        const { postId, reason, detail } = await req.json();
+        let body: any;
+        try {
+            body = await req.json();
+        } catch {
+            return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+        }
+        const { postId, reason, detail } = body;
 
         if (!postId || !reason) {
             return NextResponse.json({ error: 'postId and reason are required' }, { status: 400 });

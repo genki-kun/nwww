@@ -12,6 +12,7 @@ interface NewThreadFormProps {
     variant?: 'default' | 'primary';
 }
 
+// DEV BOY 承認テスト：物理ボタンでの最終合意を確認中
 export default function NewThreadForm({ boardId, variant = 'default' }: NewThreadFormProps) {
     const router = useRouter();
     const [title, setTitle] = useState('');
@@ -33,6 +34,9 @@ export default function NewThreadForm({ boardId, variant = 'default' }: NewThrea
         setError(null);
 
         const honeypot = (e.currentTarget as HTMLFormElement).elements.namedItem('website_url_verification') as HTMLInputElement;
+        if (honeypot?.value) {
+            return; // Silently reject spam
+        }
         try {
             const res = await fetch('/api/thread/generate', {
                 method: 'POST',
