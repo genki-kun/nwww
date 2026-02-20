@@ -24,22 +24,24 @@ const notoSansJP = Noto_Sans_JP({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | NWWW - The New World Wide Web',
-    default: 'NWWW - The New World Wide Web (Beta)',
+    template: '%s | NWWW ｜ ニュ〜',
+    default: 'NWWW ｜ ニュ〜',
   },
-  description: "AI時代の現代版匿名掲示板。AIレポーター「ニュ〜くん」による最新ニュースのスレッド生成や、AIによる要約機能を備えた、知の交差点となる次世代のBBS。",
+  description: "もっと話したいことをここで、みんなの新しい掲示板",
   metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
   openGraph: {
-    title: 'NWWW - The New World Wide Web',
-    description: "AI時代の現代版匿名掲示板。知の交差点。",
+    title: 'NWWW ｜ ニュ〜',
+    description: "もっと話したいことをここで、みんなの新しい掲示板",
     siteName: 'NWWW',
     locale: 'ja_JP',
     type: 'website',
+    images: [{ url: '/ogp.png', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'NWWW - The New World Wide Web',
-    description: "AI時代の現代版匿名掲示板。知の交差点。",
+    title: 'NWWW ｜ ニュ〜',
+    description: "もっと話したいことをここで、みんなの新しい掲示板",
+    images: ['/ogp.png'],
   },
 };
 
