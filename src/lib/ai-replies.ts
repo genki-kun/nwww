@@ -59,17 +59,28 @@ async function postAiReplies(
     maxCount: number
 ) {
     let posted = 0;
-    const baseTime = Date.now();
+    const count = Math.min(replies.filter(r => r.content).length, maxCount);
+    // 各レスの間隔を先に計算し、合計を出す
+    const intervals: number[] = [];
+    for (let i = 0; i < count; i++) {
+        if (i === 0) {
+            intervals.push((30 + Math.random() * 30) * 1000); // 30秒〜1分
+        } else {
+            intervals.push((2 + Math.random() * 3) * 60 * 1000); // 2〜5分
+        }
+    }
+    const totalSpan = intervals.reduce((a, b) => a + b, 0);
+    // 最後のレスが「今」になるよう、基準時刻を過去に設定
+    const baseTime = Date.now() - totalSpan;
+
+    let elapsed = 0;
     for (let i = 0; i < replies.length && i < maxCount; i++) {
         const reply = replies[i];
         if (!reply.content) continue;
 
         const randomId = crypto.randomBytes(5).toString('hex').substring(0, 9);
-        // 1レス目は30秒〜1分後、2レス目以降は前のレスから2〜5分後
-        const delayMs = i === 0
-            ? (30 + Math.random() * 30) * 1000
-            : (i * (2 + Math.random() * 3)) * 60 * 1000 + (30 + Math.random() * 30) * 1000;
-        const createdAt = new Date(baseTime + delayMs);
+        elapsed += intervals[posted] || 0;
+        const createdAt = new Date(baseTime + elapsed);
 
         await prisma.$transaction([
             prisma.post.create({
