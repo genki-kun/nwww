@@ -71,25 +71,26 @@ async function postAiReplies(
         const delay = minDelay + Math.random() * (maxDelay - minDelay);
         const createdAt = new Date(now + delay);
 
-        await prisma.post.create({
-            data: {
-                content: reply.content,
-                author: '名無しさん@ニュ〜',
-                userId: randomId,
-                threadId,
-                isAiGenerated: true,
-                createdAt,
-            }
-        });
-
-        await prisma.thread.update({
-            where: { id: threadId },
-            data: {
-                postCount: { increment: 1 },
-                momentum: { increment: 10 },
-                lastUpdated: createdAt,
-            }
-        });
+        await prisma.$transaction([
+            prisma.post.create({
+                data: {
+                    content: reply.content,
+                    author: '名無しさん@ニュ〜',
+                    userId: randomId,
+                    threadId,
+                    isAiGenerated: true,
+                    createdAt,
+                }
+            }),
+            prisma.thread.update({
+                where: { id: threadId },
+                data: {
+                    postCount: { increment: 1 },
+                    momentum: { increment: 10 },
+                    lastUpdated: createdAt,
+                }
+            }),
+        ]);
 
         posted++;
         console.log(`[AIReply] Posted reply ${posted} for thread ${threadId} (createdAt: ${createdAt.toISOString()})`);

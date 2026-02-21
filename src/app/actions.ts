@@ -18,7 +18,7 @@ async function requireAdmin() {
 
 function generateDailyId(ip: string): string {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    const salt = "NWWW_SECRET_SALT_V1"; // In real app, env var
+    const salt = process.env.DAILY_ID_SALT || "NWWW_SECRET_SALT_V1";
     const raw = `${ip}-${today}-${salt}`;
 
     // Create SHA-256 hash
@@ -39,8 +39,16 @@ export async function submitPost(formData: FormData) {
         return { success: false, message: 'Spam detected' };
     }
 
-    if (!boardId || !threadId || !content) {
+    if (!boardId || !threadId || !content?.trim()) {
         return { success: false, message: 'Missing required fields' };
+    }
+
+    if (content.length > 5000) {
+        return { success: false, message: '投稿は5000文字以内にしてください。' };
+    }
+
+    if (author.length > 50) {
+        return { success: false, message: '名前は50文字以内にしてください。' };
     }
 
     // Get IP
@@ -74,8 +82,16 @@ export async function createNewThread(formData: FormData) {
         return { success: false, message: 'Spam detected' };
     }
 
-    if (!boardId || !title || !content) {
+    if (!boardId || !title?.trim() || !content?.trim()) {
         return { success: false, message: 'Missing required fields' };
+    }
+
+    if (title.length > 200) {
+        return { success: false, message: 'スレッドタイトルは200文字以内にしてください。' };
+    }
+
+    if (content.length > 5000) {
+        return { success: false, message: '投稿は5000文字以内にしてください。' };
     }
 
     // Get IP for thread creator too

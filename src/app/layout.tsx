@@ -7,7 +7,6 @@ import { Noto_Sans_JP } from 'next/font/google';
 import { getBoards } from '@/data/db-actions';
 import BoardList from '@/components/BoardList';
 import AIInsights from '@/components/AIInsights';
-import SparkAdmin from '@/components/SparkAdmin';
 import ThemeToggle from '@/components/ThemeToggle';
 import MobileHeader from '@/components/MobileHeader';
 import Providers from '@/components/Providers';

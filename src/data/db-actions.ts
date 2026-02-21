@@ -353,6 +353,7 @@ export async function getAllRecentThreads(limit = 100) {
 
 export async function searchThreads(query: string, boardId?: string) {
     if (!query.trim()) return [];
+    if (query.length > 100) query = query.substring(0, 100);
 
     const where: Record<string, any> = {
         status: 'active',
