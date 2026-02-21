@@ -59,12 +59,15 @@ async function postAiReplies(
     maxCount: number
 ) {
     let posted = 0;
+    const baseTime = Date.now();
     for (let i = 0; i < replies.length && i < maxCount; i++) {
         const reply = replies[i];
         if (!reply.content) continue;
 
         const randomId = crypto.randomBytes(5).toString('hex').substring(0, 9);
-        const createdAt = new Date();
+        // 各レスを2〜5分ずつずらす（i=0は1〜3分後、i=1はさらに2〜5分後...）
+        const delayMinutes = (i + 1) * (2 + Math.random() * 3);
+        const createdAt = new Date(baseTime + delayMinutes * 60 * 1000);
 
         await prisma.$transaction([
             prisma.post.create({
