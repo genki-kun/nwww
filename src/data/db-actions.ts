@@ -454,6 +454,29 @@ export async function updateReportStatus(reportId: string, status: 'pending' | '
     return report;
 }
 
+export async function getThreadsForAdmin(boardId: string) {
+    const threads = await prisma.thread.findMany({
+        where: { boardId },
+        orderBy: { lastUpdated: 'desc' },
+        take: 100,
+        select: {
+            id: true,
+            title: true,
+            status: true,
+            postCount: true,
+            createdAt: true,
+            lastUpdated: true,
+            isAiGenerated: true,
+        }
+    });
+
+    return threads.map(t => ({
+        ...t,
+        createdAt: t.createdAt.toISOString(),
+        lastUpdated: t.lastUpdated.toISOString(),
+    }));
+}
+
 export async function updateBoardStatus(boardId: string, status: 'active' | 'locked') {
     const board = await prisma.board.update({
         where: { id: boardId },

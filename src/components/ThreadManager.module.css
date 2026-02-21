@@ -1,0 +1,175 @@
+.container {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: var(--card);
+    border-radius: 1rem;
+    border: 1px solid rgba(var(--foreground-rgb), 0.1);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.select {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(var(--foreground-rgb), 0.2);
+    background: var(--background);
+    color: var(--foreground);
+    font-size: 0.875rem;
+    min-width: 200px;
+}
+
+.stats {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+    margin-bottom: 1rem;
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted-foreground);
+    font-size: 0.9rem;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.card {
+    padding: 1rem 1.25rem;
+    border-radius: 0.75rem;
+    background: var(--background);
+    border: 1px solid rgba(var(--foreground-rgb), 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s;
+}
+
+.deleted {
+    opacity: 0.5;
+    background: var(--accent);
+}
+
+.info {
+    flex: 1;
+    min-width: 0;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 500px;
+}
+
+.aiBadge {
+    font-size: 0.65rem;
+    background: #8b5cf6;
+    color: white;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.statusBadge {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.active {
+    background: #22c55e20;
+    color: #22c55e;
+}
+
+.deleted .statusBadge,
+.statusBadge.deleted {
+    background: #ef444420;
+    color: #ef4444;
+}
+
+.archived {
+    background: #f59e0b20;
+    color: #f59e0b;
+}
+
+.filled {
+    background: #6b728020;
+    color: #6b7280;
+}
+
+.meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    margin-top: 0.25rem;
+}
+
+.actions {
+    flex-shrink: 0;
+}
+
+.deleteBtn,
+.restoreBtn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.deleteBtn {
+    background: #ef444420;
+    color: #ef4444;
+}
+
+.deleteBtn:hover {
+    background: #ef444440;
+}
+
+.restoreBtn {
+    background: var(--foreground);
+    color: var(--background);
+}
+
+.restoreBtn:hover {
+    opacity: 0.8;
+}
+
+.deleteBtn:disabled,
+.restoreBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -2,6 +2,7 @@ import { getReports, getBoards, getDailyStats } from '@/data/db-actions';
 import ReportBoard from '@/components/ReportBoard';
 import AdminAnalytics from '@/components/AdminAnalytics';
 import BoardStatusManager from '@/components/BoardStatusManager';
+import ThreadManager from '@/components/ThreadManager';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import styles from './page.module.css';
@@ -39,6 +40,10 @@ export default async function AdminPage() {
 
             <section className={styles.section}>
                 <BoardStatusManager initialBoards={allBoards as any} />
+            </section>
+
+            <section className={styles.section}>
+                <ThreadManager boards={allBoards.map(b => ({ id: b.id, name: b.name, category: b.category }))} />
             </section>
 
             <section className={styles.section}>

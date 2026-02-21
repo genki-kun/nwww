@@ -192,6 +192,19 @@ export async function deleteThreadAction(formData: FormData) {
     return { success: true };
 }
 
+export async function restoreThreadAction(formData: FormData) {
+    if (!await requireAdmin()) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
+    const threadId = formData.get('threadId') as string;
+    const boardId = formData.get('boardId') as string;
+
+    await updateThreadStatus(threadId, 'active');
+    revalidatePath(`/${boardId}`);
+    return { success: true };
+}
+
 export async function updateReportStatus(formData: FormData) {
     if (!await requireAdmin()) {
         return { success: false, message: 'Unauthorized' };
