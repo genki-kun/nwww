@@ -116,7 +116,7 @@ async function postAiReplies(
 }
 
 /**
- * スレ立て直後に2〜3件のAIレスを生成する（fire-and-forget）
+ * スレ立て直後に5〜7件のAIレスを生成する（fire-and-forget）
  */
 export async function generateAiReplies(
     threadId: string,
@@ -126,7 +126,7 @@ export async function generateAiReplies(
 ) {
     const prompt = `
 あなたは匿名掲示板「NWWW」の住人です。以下のスレッドの>>1を読んで、
-2〜3人の別々の名無しとして自然なレスを書いてください。
+5〜7人の別々の名無しとして自然なレスを書いてください。
 
 ## スレッド情報
 タイトル: ${threadTitle}
@@ -136,6 +136,7 @@ export async function generateAiReplies(
 - 各レスは別人として書く（口調や視点を変える）
 - ツッコミ、同意、煽り、補足情報、体験談、豆知識など多様に
 - アンカー（>>1 や >>2 など）を自然に使ってよい（使わなくてもよい）
+- 途中から前のレスへのアンカー（>>3 >>4 など）で会話が広がる流れも自然に
 - 1レスは短め（1〜3行程度）
 - 報道口調・丁寧語は禁止。断定調、ため口で
 - 「w」「草」「それな」「〜だろ」「〜じゃね」などネットスラングを自然に
@@ -145,12 +146,16 @@ export async function generateAiReplies(
 [
   { "content": "レス内容" },
   { "content": "レス内容" },
+  { "content": "レス内容" },
+  { "content": "レス内容" },
+  { "content": "レス内容" },
+  { "content": "レス内容" },
   { "content": "レス内容" }
 ]
 `;
 
     const replies = await callGemini(prompt);
-    const posted = await postAiReplies(replies, threadId, boardId, 3);
+    const posted = await postAiReplies(replies, threadId, boardId, 7);
     console.log(`[AIReply] Thread init done: ${posted} replies for thread ${threadId}`);
 }
 
