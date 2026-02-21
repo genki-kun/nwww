@@ -56,20 +56,15 @@ async function postAiReplies(
     replies: { content: string }[],
     threadId: string,
     boardId: string,
-    maxCount: number,
-    baseDelayMinutes: number
+    maxCount: number
 ) {
-    const now = Date.now();
     let posted = 0;
     for (let i = 0; i < replies.length && i < maxCount; i++) {
         const reply = replies[i];
         if (!reply.content) continue;
 
         const randomId = crypto.randomBytes(5).toString('hex').substring(0, 9);
-        const minDelay = (baseDelayMinutes + i * 2) * 60 * 1000;
-        const maxDelay = (baseDelayMinutes + 2 + i * 3) * 60 * 1000;
-        const delay = minDelay + Math.random() * (maxDelay - minDelay);
-        const createdAt = new Date(now + delay);
+        const createdAt = new Date();
 
         await prisma.$transaction([
             prisma.post.create({
@@ -139,7 +134,7 @@ export async function generateAiReplies(
 `;
 
     const replies = await callGemini(prompt);
-    const posted = await postAiReplies(replies, threadId, boardId, 3, 3);
+    const posted = await postAiReplies(replies, threadId, boardId, 3);
     console.log(`[AIReply] Thread init done: ${posted} replies for thread ${threadId}`);
 }
 
@@ -226,6 +221,6 @@ ${conversation}
 
     const replies = await callGemini(prompt);
     // 1〜3分後にレス（スレ立て時より短い遅延）
-    const posted = await postAiReplies(replies, threadId, boardId, maxNewReplies, 1);
+    const posted = await postAiReplies(replies, threadId, boardId, maxNewReplies);
     console.log(`[AIReply] Conversation reply done: ${posted} replies for thread ${threadId} (total AI: ${aiPostCount + posted}/${MAX_AI_REPLIES_PER_THREAD})`);
 }
