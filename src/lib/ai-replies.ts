@@ -6,9 +6,9 @@ import crypto from 'crypto';
 const MODELS_TO_TRY = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
 
 // スレッドあたりのAIレス累計上限
-const MAX_AI_REPLIES_PER_THREAD = 10;
+const MAX_AI_REPLIES_PER_THREAD = 25;
 // 人間の投稿に対してAIがレスする確率 (0〜1)
-const AI_REPLY_PROBABILITY = 0.4;
+const AI_REPLY_PROBABILITY = 0.7;
 
 /** Gemini APIを呼んでJSON配列を取得する共通ヘルパー */
 async function callGemini(prompt: string): Promise<{ content: string }[]> {
@@ -75,7 +75,7 @@ async function postAiReplies(
             data: {
                 content: reply.content,
                 author: '名無しさん@ニュ〜',
-                userId: `AI_${randomId}`,
+                userId: randomId,
                 threadId,
                 isAiGenerated: true,
                 createdAt,
@@ -173,7 +173,7 @@ export async function maybeReplyToHumanPost(
     }
 
     const remaining = MAX_AI_REPLIES_PER_THREAD - aiPostCount;
-    const maxNewReplies = Math.min(remaining, 2); // 最大2件
+    const maxNewReplies = Math.min(remaining, 3); // 最大3件
 
     // スレッド情報と直近レスを取得
     const thread = await prisma.thread.findUnique({

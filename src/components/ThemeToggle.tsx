@@ -9,14 +9,10 @@ export default function ThemeToggle() {
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        const current = document.documentElement.getAttribute('data-theme');
-        if (current === 'dark') {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setTheme('dark');
-        } else {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setTheme('light');
-        }
+        const saved = localStorage.getItem('theme');
+        const current = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        setTheme(current);
+        document.documentElement.setAttribute('data-theme', current);
         setMounted(true);
     }, []);
 
