@@ -65,9 +65,11 @@ async function postAiReplies(
         if (!reply.content) continue;
 
         const randomId = crypto.randomBytes(5).toString('hex').substring(0, 9);
-        // 各レスを2〜5分ずつずらす（i=0は1〜3分後、i=1はさらに2〜5分後...）
-        const delayMinutes = (i + 1) * (2 + Math.random() * 3);
-        const createdAt = new Date(baseTime + delayMinutes * 60 * 1000);
+        // 1レス目は30秒〜1分後、2レス目以降は前のレスから2〜5分後
+        const delayMs = i === 0
+            ? (30 + Math.random() * 30) * 1000
+            : (i * (2 + Math.random() * 3)) * 60 * 1000 + (30 + Math.random() * 30) * 1000;
+        const createdAt = new Date(baseTime + delayMs);
 
         await prisma.$transaction([
             prisma.post.create({
