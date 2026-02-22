@@ -108,6 +108,7 @@ export async function getThread(boardId: string, threadId: string) {
         where: { id: threadId },
         include: {
             posts: {
+                where: { createdAt: { lte: new Date() } }, // Hide AI replies scheduled for the future
                 orderBy: { createdAt: 'asc' } // Posts in chronological order
             },
             board: true,

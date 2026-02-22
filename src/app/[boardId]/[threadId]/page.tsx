@@ -6,6 +6,9 @@ import ThreadInteractiveView from '@/components/ThreadInteractiveView';
 import styles from './page.module.css';
 import { Metadata } from 'next';
 
+// AI replies have staggered future timestamps; re-render every 60s to reveal them gradually
+export const revalidate = 60;
+
 interface PageProps {
     params: Promise<{
         boardId: string;
