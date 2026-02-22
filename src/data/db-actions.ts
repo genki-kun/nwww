@@ -174,7 +174,7 @@ function convertThread(thread: PrismaThread) {
 
 // Data Mutation Actions
 import { revalidatePath } from 'next/cache';
-import { updateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { after } from 'next/server';
 import { generateAiReplies, maybeReplyToHumanPost } from '@/lib/ai-replies';
 
@@ -234,8 +234,8 @@ export async function addPost(boardId: string, threadId: string, data: { author:
     }
 
     // Invalidate data caches for the affected board + top page
-    updateTag(`board-${boardId}`);
-    updateTag('all-threads');
+    revalidateTag(`board-${boardId}`, { expire: 0 });
+    revalidateTag('all-threads', { expire: 0 });
     revalidatePath(`/${boardId}/${threadId}`);
 
     // after() ensures this runs after the response is sent (survives serverless shutdown)
@@ -286,8 +286,8 @@ export async function createThread(boardId: string, title: string, content: stri
 
 
     // Invalidate data caches for the affected board + top page
-    updateTag(`board-${boardId}`);
-    updateTag('all-threads');
+    revalidateTag(`board-${boardId}`, { expire: 0 });
+    revalidateTag('all-threads', { expire: 0 });
     revalidatePath(`/${boardId}`);
 
     // after() ensures this runs after the response is sent (survives serverless shutdown)

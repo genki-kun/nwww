@@ -3,8 +3,7 @@
 import { headers } from 'next/headers';
 import crypto from 'crypto';
 import { addPost, createThread, updatePostStatus, updateThreadStatus } from '@/data/db-actions';
-import { revalidatePath } from 'next/cache';
-import { updateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
@@ -191,8 +190,8 @@ export async function deleteThreadAction(formData: FormData) {
     await updateThreadStatus(threadId, 'deleted');
     revalidatePath(`/${boardId}`);
     revalidatePath('/');
-    updateTag(`board-${boardId}`);
-    updateTag('all-threads');
+    revalidateTag(`board-${boardId}`, { expire: 0 });
+    revalidateTag('all-threads', { expire: 0 });
     return { success: true };
 }
 
@@ -207,8 +206,8 @@ export async function restoreThreadAction(formData: FormData) {
     await updateThreadStatus(threadId, 'active');
     revalidatePath(`/${boardId}`);
     revalidatePath('/');
-    updateTag(`board-${boardId}`);
-    updateTag('all-threads');
+    revalidateTag(`board-${boardId}`, { expire: 0 });
+    revalidateTag('all-threads', { expire: 0 });
     return { success: true };
 }
 
