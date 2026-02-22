@@ -352,8 +352,9 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error('API Implementation Error:', error);
+        const detail = error?.message || String(error);
         return NextResponse.json(
-            { error: 'スレッドの生成に失敗しました。しばらくしてから再度お試しください。' },
+            { error: 'スレッドの生成に失敗しました。しばらくしてから再度お試しください。', detail },
             { status: 500 }
         );
     }
