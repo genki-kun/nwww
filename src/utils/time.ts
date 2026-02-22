@@ -3,6 +3,9 @@ export function getRelativeTime(dateString: string): string {
     const past = new Date(dateString);
     const diffMs = now.getTime() - past.getTime();
 
+    // 未来の時刻の場合は「たった今」として扱う
+    if (diffMs < 0) return 'たった今';
+
     // Convert to seconds
     const diffSec = Math.floor(diffMs / 1000);
     if (diffSec < 60) return `${diffSec}秒前`;

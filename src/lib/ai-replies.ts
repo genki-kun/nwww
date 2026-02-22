@@ -97,7 +97,7 @@ async function postAiReplies(
                 data: {
                     postCount: { increment: 1 },
                     momentum: { increment: 10 },
-                    lastUpdated: createdAt,
+                    lastUpdated: new Date(), // 実時刻を使用（未来のcreatedAtを設定するとマイナス表示になる）
                 }
             }),
         ]);
